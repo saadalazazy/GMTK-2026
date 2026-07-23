@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6972514775296507344}
   - component: {fileID: 209802161684853523}
   - component: {fileID: 37875445007548831}
+  - component: {fileID: 3326321476291923970}
   m_Layer: 0
   m_Name: Harpoon Arrow
   m_TagString: Untagged
@@ -141,3 +142,18 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -7514120705249237670, guid: d3dcb3851ec0d238cb496a6e0f822e61, type: 3}
+--- !u!114 &3326321476291923970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992213622909238415}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba588f27c299355139777da1021a59ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArrowController
+  lifetime: 5
+  rotationSmoothing: 10
+  damageAmount: 50

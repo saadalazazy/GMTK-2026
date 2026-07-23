@@ -1,5 +1,7 @@
 ﻿<Solution>
+  <Project Path="NWH.DWP2.csproj" />
   <Project Path="ColbyO.VNTG.csproj" />
+  <Project Path="NWH.Common.csproj" />
   <Project Path="Assembly-CSharp-firstpass.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="ColbyO.VNTG.Editor.csproj" />

@@ -1,8 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Ditzelgames;
 
+[RequireComponent(typeof(MeshRenderer))]
 public class Waves : MonoBehaviour
 {
     //Public Properties
@@ -10,11 +10,16 @@ public class Waves : MonoBehaviour
     public float UVScale = 2f;
     public Octave[] Octaves;
 
+    // Max octaves the shader supports (must match the array size declared
+    // in WaveShader.shader: _OctaveScaleHeight[MAX_OCTAVES] / _OctaveSpeed[MAX_OCTAVES])
+    const int MaxOctaves = 8;
+
     //Mesh
     protected MeshFilter MeshFilter;
+    protected MeshRenderer MeshRenderer;
     protected Mesh Mesh;
+    protected Material MaterialInstance;
 
-    // Start is called before the first frame update
     void Start()
     {
         Mesh = new Mesh();
@@ -25,42 +30,101 @@ public class Waves : MonoBehaviour
         Mesh.uv = GenerateUVs();
         Mesh.RecalculateNormals();
         Mesh.RecalculateBounds();
+        // The mesh never moves on the CPU again after this, so give it a
+        // generous bounds box up front (avoids incorrect culling once the
+        // GPU pushes vertices outside the flat plane's original bounds).
+        var b = Mesh.bounds;
+        var maxHeight = 0f;
+        foreach (var o in Octaves) maxHeight += Mathf.Abs(o.height);
+        b.Expand(new Vector3(0, maxHeight * 2f, 0));
+        Mesh.bounds = b;
 
         MeshFilter = gameObject.AddComponent<MeshFilter>();
         MeshFilter.mesh = Mesh;
+
+        MeshRenderer = GetComponent<MeshRenderer>();
+        MaterialInstance = MeshRenderer.material; // instantiates a unique material
+
+        BuildPermutationTexture();
+        PushOctavesToShader();
     }
 
+    // Bakes the shared permutation table into a 256x1 texture the shader
+    // samples from, so GPU noise uses the exact same hash as the CPU noise.
+    void BuildPermutationTexture()
+    {
+        var tex = new Texture2D(256, 1, TextureFormat.RGBA32, false, true);
+        tex.wrapMode = TextureWrapMode.Repeat;
+        tex.filterMode = FilterMode.Point;
+
+        var colors = new Color[256];
+        for (int i = 0; i < 256; i++)
+        {
+            float v = PerlinNoise.Permutation[i] / 255f;
+            colors[i] = new Color(v, v, v, v);
+        }
+        tex.SetPixels(colors);
+        tex.Apply(false, true);
+
+        MaterialInstance.SetTexture("_PermTable", tex);
+    }
+
+    void PushOctavesToShader()
+    {
+        var scaleHeight = new Vector4[MaxOctaves];
+        var speed = new Vector4[MaxOctaves];
+
+        int count = Mathf.Min(Octaves.Length, MaxOctaves);
+        for (int i = 0; i < count; i++)
+        {
+            scaleHeight[i] = new Vector4(Octaves[i].scale.x, Octaves[i].scale.y, Octaves[i].height, Octaves[i].alternate ? 1f : 0f);
+            speed[i] = new Vector4(Octaves[i].speed.x, Octaves[i].speed.y, 0f, 0f);
+        }
+
+        MaterialInstance.SetVectorArray("_OctaveScaleHeight", scaleHeight);
+        MaterialInstance.SetVectorArray("_OctaveSpeed", speed);
+        MaterialInstance.SetFloat("_Dimension", Dimension);
+
+        if (Octaves.Length > MaxOctaves)
+            Debug.LogWarning($"Waves: {Octaves.Length} octaves configured, but WaveShader.shader only supports {MaxOctaves}. Extra octaves are ignored by the GPU (raise MaxOctaves in both Waves.cs and the shader if you need more).");
+    }
+
+    /// <summary>
+    /// Analytic wave height at a world position, used by floating objects.
+    /// This purposefully does NOT read Mesh.vertices any more (the CPU copy
+    /// of the mesh is flat and stays flat - only the GPU displaces it), and
+    /// it purposefully does NOT do 4-corner interpolation any more: since
+    /// the displacement is a continuous function of (x, z), we can just
+    /// evaluate it directly at the exact local position instead of
+    /// sampling/blending the nearest grid vertices.
+    /// </summary>
     public float GetHeight(Vector3 position)
     {
-        var scale = new Vector3(1 / transform.lossyScale.x, 0, 1 / transform.lossyScale.z);
-        var localPos = Vector3.Scale((position - transform.position), scale);
+        var scale = new Vector3(1f / transform.lossyScale.x, 0f, 1f / transform.lossyScale.z);
+        var localPos = Vector3.Scale(position - transform.position, scale);
 
-        var p1 = new Vector3(Mathf.Floor(localPos.x), 0, Mathf.Floor(localPos.z));
-        var p2 = new Vector3(Mathf.Floor(localPos.x), 0, Mathf.Ceil(localPos.z));
-        var p3 = new Vector3(Mathf.Ceil(localPos.x), 0, Mathf.Floor(localPos.z));
-        var p4 = new Vector3(Mathf.Ceil(localPos.x), 0, Mathf.Ceil(localPos.z));
+        float x = Mathf.Clamp(localPos.x, 0, Dimension);
+        float z = Mathf.Clamp(localPos.z, 0, Dimension);
 
-        p1.x = Mathf.Clamp(p1.x, 0, Dimension);
-        p1.z = Mathf.Clamp(p1.z, 0, Dimension);
-        p2.x = Mathf.Clamp(p2.x, 0, Dimension);
-        p2.z = Mathf.Clamp(p2.z, 0, Dimension);
-        p3.x = Mathf.Clamp(p3.x, 0, Dimension);
-        p3.z = Mathf.Clamp(p3.z, 0, Dimension);
-        p4.x = Mathf.Clamp(p4.x, 0, Dimension);
-        p4.z = Mathf.Clamp(p4.z, 0, Dimension);
+        float y = 0f;
+        for (int o = 0; o < Octaves.Length; o++)
+        {
+            if (Octaves[o].alternate)
+            {
+                float perl = PerlinNoise.Perlin2D((x * Octaves[o].scale.x) / Dimension, (z * Octaves[o].scale.y) / Dimension) * Mathf.PI * 2f;
+                y += Mathf.Cos(perl + Octaves[o].speed.magnitude * Time.time) * Octaves[o].height;
+            }
+            else
+            {
+                float perl = PerlinNoise.Perlin2D((x * Octaves[o].scale.x + Time.time * Octaves[o].speed.x) / Dimension, (z * Octaves[o].scale.y + Time.time * Octaves[o].speed.y) / Dimension) - 0.5f;
+                y += perl * Octaves[o].height;
+            }
+        }
 
-        var max = Mathf.Max(Vector3.Distance(p1, localPos), Vector3.Distance(p2, localPos), Vector3.Distance(p3, localPos), Vector3.Distance(p4, localPos) + Mathf.Epsilon);
-        var dist = (max - Vector3.Distance(p1, localPos))
-                 + (max - Vector3.Distance(p2, localPos))
-                 + (max - Vector3.Distance(p3, localPos))
-                 + (max - Vector3.Distance(p4, localPos) + Mathf.Epsilon);
-        var height = Mesh.vertices[index(p1.x, p1.z)].y * (max - Vector3.Distance(p1, localPos))
-                   + Mesh.vertices[index(p2.x, p2.z)].y * (max - Vector3.Distance(p2, localPos))
-                   + Mesh.vertices[index(p3.x, p3.z)].y * (max - Vector3.Distance(p3, localPos))
-                   + Mesh.vertices[index(p4.x, p4.z)].y * (max - Vector3.Distance(p4, localPos));
-
-        return height * transform.lossyScale.y / dist;
-
+        // NOTE: previous version omitted transform.position.y here, which
+        // only "worked" if the water plane sat at world Y=0. Fixed so the
+        // Waves object can be placed anywhere.
+        return y * transform.lossyScale.y + transform.position.y;
     }
 
     private Vector3[] GenerateVerts()
@@ -110,44 +174,21 @@ public class Waves : MonoBehaviour
         return uvs;
     }
 
-    private int index(int x, int z)
-    {
-        return x * (Dimension + 1) + z;
-    }
+    private int index(int x, int z) => x * (Dimension + 1) + z;
 
-    private int index(float x, float z)
-    {
-        return index((int)x, (int)z);
-    }
+    // Update() is gone on purpose: the CPU no longer writes Mesh.vertices or
+    // calls RecalculateNormals() every frame. All visible motion now happens
+    // in WaveShader.shader's vertex function, driven by _Time and the
+    // octave arrays pushed once (and whenever Octaves changes, see
+    // OnValidate below).
 
-    void Update()
+#if UNITY_EDITOR
+    void OnValidate()
     {
-        var verts = Mesh.vertices;
-        for (int x = 0; x <= Dimension; x++)
-        {
-            for (int z = 0; z <= Dimension; z++)
-            {
-                var y = 0f;
-                for (int o = 0; o < Octaves.Length; o++)
-                {
-                    if (Octaves[o].alternate)
-                    {
-                        var perl = Mathf.PerlinNoise((x * Octaves[o].scale.x) / Dimension, (z * Octaves[o].scale.y) / Dimension) * Mathf.PI * 2f;
-                        y += Mathf.Cos(perl + Octaves[o].speed.magnitude * Time.time) * Octaves[o].height;
-                    }
-                    else
-                    {
-                        var perl = Mathf.PerlinNoise((x * Octaves[o].scale.x + Time.time * Octaves[o].speed.x) / Dimension, (z * Octaves[o].scale.y + Time.time * Octaves[o].speed.y) / Dimension) - 0.5f;
-                        y += perl * Octaves[o].height;
-                    }
-                }
-
-                verts[index(x, z)] = new Vector3(x, y, z);
-            }
-        }
-        Mesh.vertices = verts;
-        Mesh.RecalculateNormals();
+        if (MaterialInstance != null)
+            PushOctavesToShader();
     }
+#endif
 
     [Serializable]
     public struct Octave

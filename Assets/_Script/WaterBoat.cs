@@ -1,7 +1,4 @@
 using Ditzelgames;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(WaterFloat))]
@@ -13,53 +10,53 @@ public class WaterBoat : MonoBehaviour
     public float Power = 5f;
     public float MaxSpeed = 10f;
     public float Drag = 0.1f;
+    public float SteerSmoothing = 5f; // higher = snappier turning response
 
     //used Components
     protected Rigidbody Rigidbody;
     protected Quaternion StartRotation;
     protected ParticleSystem ParticleSystem;
-    protected Camera Camera;
 
     //internal Properties
-    protected Vector3 CamVel;
-
+    protected float currentSteer;
 
     public void Awake()
     {
         ParticleSystem = GetComponentInChildren<ParticleSystem>();
         Rigidbody = GetComponent<Rigidbody>();
         StartRotation = Motor.localRotation;
-        Camera = Camera.main;
     }
 
     public void FixedUpdate()
     {
-        //default direction
-        var forceDirection = transform.forward;
-        var steer = 0;
-
-        //steer direction [-1,0,1]
-        if (Input.GetKey(KeyCode.A))
-            steer = 1;
-        if (Input.GetKey(KeyCode.D))
-            steer = -1;
-
+        //steer direction [-1,0,1], smoothed so the rudder doesn't snap instantly
+        float targetSteer = 0f;
+        if (Input.GetKey(KeyCode.A)) targetSteer = 1f;
+        if (Input.GetKey(KeyCode.D)) targetSteer = -1f;
+        currentSteer = Mathf.MoveTowards(currentSteer, targetSteer, SteerSmoothing * Time.fixedDeltaTime);
 
         //Rotational Force
-        Rigidbody.AddForceAtPosition(steer * transform.right * SteerPower / 100f, Motor.position);
+        Rigidbody.AddForceAtPosition(currentSteer * transform.right * SteerPower / 100f, Motor.position);
 
         //compute vectors
         var forward = Vector3.Scale(new Vector3(1, 0, 1), transform.forward);
-        var targetVel = Vector3.zero;
 
-        //forward/backward poewr
+        //forward/backward power
         if (Input.GetKey(KeyCode.W))
             PhysicsHelper.ApplyForceToReachVelocity(Rigidbody, forward * MaxSpeed, Power);
         if (Input.GetKey(KeyCode.S))
             PhysicsHelper.ApplyForceToReachVelocity(Rigidbody, forward * -MaxSpeed, Power);
 
-        //Motor Animation // Particle system
-        Motor.SetPositionAndRotation(Motor.position, transform.rotation * StartRotation * Quaternion.Euler(0, 30f * steer, 0));
+        //hard cap so external forces (waves, collisions) can't push the boat past MaxSpeed indefinitely
+        var flatVel = Vector3.Scale(Rigidbody.linearVelocity, new Vector3(1, 0, 1));
+        if (flatVel.magnitude > MaxSpeed)
+        {
+            var clamped = Vector3.ClampMagnitude(flatVel, MaxSpeed);
+            Rigidbody.linearVelocity = new Vector3(clamped.x, Rigidbody.linearVelocity.y, clamped.z);
+        }
+
+        //Motor Animation / Particle system
+        Motor.SetPositionAndRotation(Motor.position, transform.rotation * StartRotation * Quaternion.Euler(0, 30f * currentSteer, 0));
         if (ParticleSystem != null)
         {
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
@@ -68,15 +65,12 @@ public class WaterBoat : MonoBehaviour
                 ParticleSystem.Pause();
         }
 
-        //moving forward
+        //moving forward?
         var movingForward = Vector3.Cross(transform.forward, Rigidbody.linearVelocity).y < 0;
 
-        //move in direction
-        Rigidbody.linearVelocity = Quaternion.AngleAxis(Vector3.SignedAngle(Rigidbody.linearVelocity, (movingForward ? 1f : 0f) * transform.forward, Vector3.up) * Drag, Vector3.up) * Rigidbody.linearVelocity;
-
-        //camera position
-        //Camera.transform.LookAt(transform.position + transform.forward * 6f + transform.up * 2f);
-        //Camera.transform.position = Vector3.SmoothDamp(Camera.transform.position, transform.position + transform.forward * -8f + transform.up * 2f, ref CamVel, 0.05f);
+        //bleed off sideways drift, turning velocity toward facing direction
+        Rigidbody.linearVelocity = Quaternion.AngleAxis(
+            Vector3.SignedAngle(Rigidbody.linearVelocity, (movingForward ? 1f : 0f) * transform.forward, Vector3.up) * Drag,
+            Vector3.up) * Rigidbody.linearVelocity;
     }
-
 }

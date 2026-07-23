@@ -16,16 +16,18 @@ public class ArrowController : MonoBehaviour
         Destroy(gameObject, lifetime);
     }
 
-    void FixedUpdate()
-    {
-        if (hasHit || rb.linearVelocity.sqrMagnitude < 0.1f) return;
-
-        Quaternion targetRotation = Quaternion.LookRotation(rb.linearVelocity.normalized, Vector3.up);
-        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSmoothing * Time.fixedDeltaTime));
-    }
+    // void FixedUpdate()
+    // {
+    //     if (hasHit || rb.linearVelocity.sqrMagnitude < 0.1f) return;
+    //
+    //     Quaternion targetRotation = Quaternion.LookRotation(rb.linearVelocity.normalized, Vector3.up);
+    //     rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSmoothing * Time.fixedDeltaTime));
+    // }
 
     void OnCollisionEnter(Collision collision)
     {
+        print("Arrow hit shark: " + collision.gameObject.name);
+
         hasHit = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -34,7 +36,6 @@ public class ArrowController : MonoBehaviour
         SharkEnemy shark = collision.gameObject.GetComponentInParent<SharkEnemy>();
         if (shark != null)
         {
-            print("Arrow hit shark: " + shark.name);
             shark.TakeDamage(damageAmount);
         }
 

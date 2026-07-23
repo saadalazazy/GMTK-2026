@@ -91,6 +91,9 @@ public class HarpoonController : MonoBehaviour
                 rb.AddForce(mainCamera.transform.forward * shootingForce); // Adjust force as needed
             }
 
+            ArrowController arrowController = loadedArrow.GetComponent<ArrowController>();
+            arrowController.enabled = true;
+
             camera.transform.DOShakeRotation(0.2f, 1f, 2, 40);
 
             audioSource.PlayOneShot(shootSound);

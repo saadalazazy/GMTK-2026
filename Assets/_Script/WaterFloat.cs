@@ -57,7 +57,7 @@ public class WaterFloat : MonoBehaviour
         {
             //height
             WaterLinePoints[i] = FloatPoints[i].position;
-            WaterLinePoints[i].y = Waves.GetHeight(FloatPoints[i].position);
+            WaterLinePoints[i].y = Waves != null ? Waves.GetHeight(FloatPoints[i].position) : 0f;
             newWaterLine += WaterLinePoints[i].y / FloatPoints.Length;
             if (WaterLinePoints[i].y > FloatPoints[i].position.y)
                 pointUnderWater = true;

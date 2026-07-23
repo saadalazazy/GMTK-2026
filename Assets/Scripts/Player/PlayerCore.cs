@@ -33,6 +33,10 @@ public class PlayerCore : MonoBehaviour
     [Header("Input Actions")]
     public InputActionAsset actions;
 
+    [Header("Utils")]
+    public Transform handMesh;
+
+
     private CharacterController controller;
     private AudioSource audioSource;
     private InputAction moveAction;
@@ -49,6 +53,8 @@ public class PlayerCore : MonoBehaviour
     private Vector2 handSpringVelocity;
     private Vector3 bobVelocity;
 
+
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -62,6 +68,16 @@ public class PlayerCore : MonoBehaviour
         sprintAction = gameplay.FindAction("Sprint");
 
         gameplay.Enable();
+    }
+
+    void OnDisable()
+    {
+        handMesh.gameObject.SetActive(false);
+    }
+
+    void OnEnable()
+    {
+        handMesh.gameObject.SetActive(true);
     }
 
     void Update()

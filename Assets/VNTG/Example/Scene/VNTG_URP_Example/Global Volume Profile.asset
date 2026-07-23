@@ -1,0 +1,265 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1154980957003971943
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a169137338a2f47986f6bc8e00dfe8, type: 3}
+  m_Name: CRTSettings
+  m_EditorClassIdentifier: VNTG::VNTG.CRT.CRTSettings
+  active: 1
+  Enabled:
+    m_OverrideState: 1
+    m_Value: 0
+  ShowInSceneView:
+    m_OverrideState: 1
+    m_Value: 1
+  ScreenResolution:
+    m_OverrideState: 1
+    m_Value: {x: 640, y: 480}
+  UseMaxFPS:
+    m_OverrideState: 1
+    m_Value: 0
+  RefreshRate:
+    m_OverrideState: 1
+    m_Value: 50
+  DecayRate:
+    m_OverrideState: 1
+    m_Value: 0.9
+  EnableInterlacedRendering:
+    m_OverrideState: 1
+    m_Value: 1
+  EnableScreenBend:
+    m_OverrideState: 1
+    m_Value: 1
+  ScreenBend:
+    m_OverrideState: 1
+    m_Value: 3
+  ScreenRoundness:
+    m_OverrideState: 1
+    m_Value: 0.539
+  VignetteOpacity:
+    m_OverrideState: 1
+    m_Value: 0.893
+  ScanLineVerticalOpacity:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineHorizontalOpacity:
+    m_OverrideState: 1
+    m_Value: 1
+  ScanLineVerticalSpeed:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineHorizontalSpeed:
+    m_OverrideState: 1
+    m_Value: -0.25
+  ScanLineStrength:
+    m_OverrideState: 1
+    m_Value: 0.3
+  NoiseScale:
+    m_OverrideState: 1
+    m_Value: 0.568
+  NoiseRBGOffsetX:
+    m_OverrideState: 1
+    m_Value: 0.4
+  NoiseRBGOffsetY:
+    m_OverrideState: 1
+    m_Value: 0.7
+  NoiseSpeed:
+    m_OverrideState: 1
+    m_Value: 0.1
+  NoiseFade:
+    m_OverrideState: 1
+    m_Value: 0.356
+  VhsSmear:
+    m_OverrideState: 1
+    m_Value: 0.96
+  EnableTrackerLine:
+    m_OverrideState: 1
+    m_Value: 1
+  TrackingSpeed:
+    m_OverrideState: 1
+    m_Value: 4.8
+  TrackingJitter:
+    m_OverrideState: 1
+    m_Value: 12.1
+  GlitchChance:
+    m_OverrideState: 1
+    m_Value: 0.083
+  GlitchLength:
+    m_OverrideState: 1
+    m_Value: 15
+  EnableSignalInterference:
+    m_OverrideState: 1
+    m_Value: 1
+  InterferenceFrequency:
+    m_OverrideState: 1
+    m_Value: 80.2
+  InterferenceAmplitude:
+    m_OverrideState: 1
+    m_Value: 0.296
+  ChromaticOffset:
+    m_OverrideState: 1
+    m_Value: 0
+  ChromaticOffsetSpeed:
+    m_OverrideState: 1
+    m_Value: 0.1
+  SubPixelMode:
+    m_OverrideState: 1
+    m_Value: 0
+  SubPixelDensity:
+    m_OverrideState: 1
+    m_Value: 175.5
+  UnsharpAmount:
+    m_OverrideState: 1
+    m_Value: 0.07
+  UnsharpRadius:
+    m_OverrideState: 1
+    m_Value: 1
+  UnsharpThreshold:
+    m_OverrideState: 1
+    m_Value: 0.02
+  ClampBlack:
+    m_OverrideState: 1
+    m_Value: 0
+  ClampWhite:
+    m_OverrideState: 1
+    m_Value: 0.95
+  ShadowTint:
+    m_OverrideState: 1
+    m_Value: {r: 0.7, g: 0.6, b: 0.9, a: 1}
+  Gamma:
+    m_OverrideState: 1
+    m_Value: 0.599
+  Brightness:
+    m_OverrideState: 1
+    m_Value: 0.5
+  Contrast:
+    m_OverrideState: 1
+    m_Value: 0.53
+  Saturation:
+    m_OverrideState: 1
+    m_Value: 0.5
+  Hue:
+    m_OverrideState: 1
+    m_Value: 0
+  RedShift:
+    m_OverrideState: 1
+    m_Value: 0
+  BlueShift:
+    m_OverrideState: 1
+    m_Value: 0
+  GreenShift:
+    m_OverrideState: 1
+    m_Value: 0
+  IsMonochrome:
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Global Volume Profile
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
+  components:
+  - {fileID: 4640766141785539805}
+  - {fileID: -1154980957003971943}
+--- !u!114 &4640766141785539805
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dbed17f5f145d64589ad7ae3c637fc3, type: 3}
+  m_Name: PSXEffectSettings
+  m_EditorClassIdentifier: VNTG::VNTG.PSX.PSXEffectSettings
+  active: 1
+  Enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  ShowInSceneView:
+    m_OverrideState: 1
+    m_Value: 1
+  AmbientColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
+  EnablePixelation:
+    m_OverrideState: 1
+    m_Value: 1
+  PixelResolution:
+    m_OverrideState: 1
+    m_Value: {x: 320, y: 256}
+  EnableColorPrecision:
+    m_OverrideState: 1
+    m_Value: 1
+  ColorPrecision:
+    m_OverrideState: 1
+    m_Value: 24
+  EnableDither:
+    m_OverrideState: 1
+    m_Value: 1
+  DitherMode:
+    m_OverrideState: 1
+    m_Value: 2
+  DitherPattern:
+    m_OverrideState: 1
+    m_Value: 1
+  DitherPixelPerfect:
+    m_OverrideState: 1
+    m_Value: 1
+  DitherScale:
+    m_OverrideState: 1
+    m_Value: 0.193
+  DitherThreshold:
+    m_OverrideState: 1
+    m_Value: 0
+  EnableColorPalette:
+    m_OverrideState: 1
+    m_Value: 0
+  PreserveLighting:
+    m_OverrideState: 1
+    m_Value: 1
+  NormalizeLuminanceBeforeSampling:
+    m_OverrideState: 1
+    m_Value: 0
+  PaletteAsset:
+    m_OverrideState: 1
+    m_Value: {fileID: 5022602860645237092, guid: 8d011e57e6d4f8147820ff2fb97d554c, type: 3}
+  EnableFog:
+    m_OverrideState: 1
+    m_Value: 1
+  IgnoreSkybox:
+    m_OverrideState: 1
+    m_Value: 1
+  FogColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.1453809, g: 0.1981132, b: 0.124288, a: 1}
+  FogDensity:
+    m_OverrideState: 1
+    m_Value: 0.09
+  FogNoiseStrength:
+    m_OverrideState: 1
+    m_Value: 0.435
+  FogEdgeSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.151
+  FogNoiseScale:
+    m_OverrideState: 1
+    m_Value: 0.531
+  FogNoiseStart:
+    m_OverrideState: 1
+    m_Value: 0.026

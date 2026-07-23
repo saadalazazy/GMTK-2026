@@ -5,6 +5,7 @@ public class ArrowController : MonoBehaviour
 {
     [SerializeField] private float lifetime = 5f;
     [SerializeField] private float rotationSmoothing = 10f;
+    [SerializeField] private float damageAmount = 50f;
 
     Rigidbody rb;
     bool hasHit;
@@ -29,6 +30,13 @@ public class ArrowController : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
+
+        SharkEnemy shark = collision.gameObject.GetComponentInParent<SharkEnemy>();
+        if (shark != null)
+        {
+            print("Arrow hit shark: " + shark.name);
+            shark.TakeDamage(damageAmount);
+        }
 
         transform.SetParent(collision.transform);
 

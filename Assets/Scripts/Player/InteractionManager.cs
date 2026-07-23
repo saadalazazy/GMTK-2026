@@ -7,7 +7,13 @@ public class InteractionManager : MonoBehaviour
     public InputActionAsset actions;
 
     InputAction interactAction;
+    InputAction useAction;
     IInteractable currentTarget;
+
+    [SerializeField] private Transform heldItemAnchor;
+
+    BaseHeldItem currentHeldItem;
+
     Camera mainCamera;
 
     void Start()
@@ -16,6 +22,8 @@ public class InteractionManager : MonoBehaviour
 
         var gameplay = actions.FindActionMap("Player");
         interactAction = gameplay.FindAction("Interact");
+        useAction = gameplay.FindAction("Attack");
+
     }
 
     void Update()
@@ -24,6 +32,29 @@ public class InteractionManager : MonoBehaviour
 
         if (interactAction.WasPressedThisFrame() && currentTarget != null)
             currentTarget.Interact(gameObject);
+
+        if (useAction.IsPressed() && currentHeldItem != null)
+            currentHeldItem.OnItemUse(gameObject);
+
+        if (useAction.WasReleasedThisFrame() && currentHeldItem != null)
+            currentHeldItem.OnItemRelease(gameObject);
+
+    }
+
+    public void HoldItem(BaseHeldItem item)
+    {
+        if (currentHeldItem != null)
+            currentHeldItem.OnItemDrop(gameObject);
+
+        currentHeldItem = item;
+
+        currentHeldItem.transform.SetParent(heldItemAnchor);
+
+
+        if (currentHeldItem != null)
+            currentHeldItem.OnItemPickup(gameObject);
+
+        print("Holding item: " + (currentHeldItem != null ? currentHeldItem.ToString() : "None"));
     }
 
     void CheckForInteractable()

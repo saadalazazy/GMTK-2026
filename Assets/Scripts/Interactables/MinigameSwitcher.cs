@@ -43,6 +43,8 @@ public class MinigameSwitcher : MonoBehaviour
                 playerCore.enabled = false;
             }
 
+            playerCore.transform.GetComponent<InteractionManager>().enabled = false;
+
             targetCamera.Priority = 20;
         }
         else
@@ -53,6 +55,8 @@ public class MinigameSwitcher : MonoBehaviour
             {
                 playerCore.enabled = true;
             }
+            playerCore.transform.GetComponent<InteractionManager>().enabled = true;
+
 
             targetCamera.Priority = -1;
         }

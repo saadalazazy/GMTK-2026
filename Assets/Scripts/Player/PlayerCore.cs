@@ -11,14 +11,20 @@ public class PlayerCore : MonoBehaviour
     public float jumpHeight = 1.5f;
 
     [Header("Look")]
-    public float mouseSensitivity = 0.2f;
+    public float mouseSensitivity = 30f; // Adjusted for Time.deltaTime scaling
     public float maxLookAngle = 80f;
     public Transform cameraAnchor;
     public Transform cameraBob;
 
     [Header("Head Bob")]
     public float bobFrequency = 8f;
-    public float bobAmplitude = 0.05f;
+    public float bobVerticalAmplitude = 0.05f;
+    public float bobHorizontalAmplitude = 0.03f;
+
+    [Header("Hand Inertia")]
+    public float handSpringStiffness = 150f;
+    public float handDamping = 12f;
+    public float handMass = 1f;
 
     [Header("Footsteps")]
     public AudioClip[] footstepClips;
@@ -27,18 +33,21 @@ public class PlayerCore : MonoBehaviour
     [Header("Input Actions")]
     public InputActionAsset actions;
 
-    CharacterController controller;
-    AudioSource audioSource;
-    InputAction moveAction;
-    InputAction lookAction;
-    InputAction jumpAction;
-    InputAction sprintAction;
+    private CharacterController controller;
+    private AudioSource audioSource;
+    private InputAction moveAction;
+    private InputAction lookAction;
+    private InputAction jumpAction;
+    private InputAction sprintAction;
 
-    Vector3 velocity;
-    float xRotation;
-    float bobTimer;
-    bool wasBobBottom;
-    bool isSprinting;
+    private Vector3 velocity;
+    private float xRotation;
+    private float bobTimer;
+    private bool wasBobBottom;
+    private bool isSprinting;
+    private Vector2 handOffset;
+    private Vector2 handSpringVelocity;
+    private Vector3 bobVelocity;
 
     void Start()
     {
@@ -52,7 +61,7 @@ public class PlayerCore : MonoBehaviour
         jumpAction = gameplay.FindAction("Jump");
         sprintAction = gameplay.FindAction("Sprint");
 
-        actions.FindActionMap("Player").Enable();
+        gameplay.Enable();
     }
 
     void Update()
@@ -63,6 +72,7 @@ public class PlayerCore : MonoBehaviour
 
     void HandleMovement()
     {
+        // 1. Gravity logic
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
         else if (!controller.isGrounded)
@@ -74,30 +84,39 @@ public class PlayerCore : MonoBehaviour
         isSprinting = sprintAction.IsPressed() && input.magnitude > 0.1f;
         float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
 
+        // 2. Bob timer advancement
         if (input.magnitude > 0.1f && controller.isGrounded)
         {
             float bobSpeedMultiplier = isSprinting ? 1.4f : 1f;
             bobTimer += Time.deltaTime * bobFrequency * bobSpeedMultiplier;
         }
-        else
-            bobTimer = 0f;
 
+        // 3. Camera/Hand Bob calculation
         if (cameraBob)
         {
-            float target = 0f;
+            Vector3 targetBob = Vector3.zero;
             if (input.magnitude > 0.1f && controller.isGrounded)
-                target = Mathf.Sin(bobTimer) * bobAmplitude;
-            cameraBob.localPosition = Vector3.Lerp(cameraBob.localPosition, new Vector3(0f, target, 0f), Time.deltaTime * bobFrequency);
+            {
+                float verticalBob = Mathf.Sin(bobTimer) * bobVerticalAmplitude;
+                float horizontalBob = Mathf.Cos(bobTimer / 2f) * bobHorizontalAmplitude;
+                targetBob = new Vector3(horizontalBob, verticalBob, 0f);
+            }
+            cameraBob.localPosition = Vector3.SmoothDamp(cameraBob.localPosition, targetBob, ref bobVelocity, 1f / bobFrequency);
         }
 
-        bool isBobBottom = Mathf.Sin(bobTimer) < -0.9f;
+        // 4. Footstep triggering at sinusoidal trough
+        bool isBobBottom = Mathf.Sin(bobTimer) < -0.85f;
         if (isBobBottom && !wasBobBottom && input.magnitude > 0.1f && controller.isGrounded)
+        {
             PlayFootstep();
+        }
         wasBobBottom = isBobBottom;
 
+        // 5. Jump logic
         if (jumpAction.WasPressedThisFrame() && controller.isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
+        // 6. Character Controller movement execution
         controller.Move((move * currentSpeed + velocity) * Time.deltaTime);
     }
 
@@ -105,8 +124,9 @@ public class PlayerCore : MonoBehaviour
     {
         Vector2 input = lookAction.ReadValue<Vector2>();
 
-        float mx = input.x * mouseSensitivity;
-        float my = input.y * mouseSensitivity;
+        // Multiply by Time.deltaTime for frame-rate independent camera movement
+        float mx = input.x * mouseSensitivity * Time.deltaTime;
+        float my = input.y * mouseSensitivity * Time.deltaTime;
 
         xRotation -= my;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
@@ -115,11 +135,28 @@ public class PlayerCore : MonoBehaviour
             cameraAnchor.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
         transform.Rotate(Vector3.up * mx);
+
+        // Hand inertia spring-damper physics
+        if (cameraBob)
+        {
+            Vector2 springForce = -handSpringStiffness * handOffset;
+            Vector2 dampingForce = -handDamping * handSpringVelocity;
+
+            // Normalize input force across frame durations
+            Vector2 inputForce = input * (handSpringStiffness * 0.05f);
+            Vector2 totalForce = springForce + dampingForce + inputForce;
+
+            Vector2 acceleration = totalForce / handMass;
+            handSpringVelocity += acceleration * Time.deltaTime;
+            handOffset += handSpringVelocity * Time.deltaTime;
+
+            cameraBob.localRotation = Quaternion.Euler(handOffset.y, handOffset.x, 0f);
+        }
     }
 
     void PlayFootstep()
     {
-        if (footstepClips.Length == 0) return;
+        if (footstepClips == null || footstepClips.Length == 0) return;
         audioSource.pitch = Random.Range(0.9f, 1.1f);
         audioSource.PlayOneShot(footstepClips[Random.Range(0, footstepClips.Length)], footstepVolume);
     }

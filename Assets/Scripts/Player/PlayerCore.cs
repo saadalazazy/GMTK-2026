@@ -13,6 +13,7 @@ public class PlayerCore : MonoBehaviour
     public float mouseSensitivity = 0.2f;
     public float maxLookAngle = 80f;
     public Transform cameraAnchor;
+    public Transform cameraBob;
 
     [Header("Head Bob")]
     public float bobFrequency = 8f;
@@ -64,10 +65,12 @@ public class PlayerCore : MonoBehaviour
         else
             bobTimer = 0f;
 
-        if (cameraAnchor)
+        if (cameraBob)
         {
-            float bobOffset = Mathf.Sin(bobTimer) * bobAmplitude * Mathf.Min(input.magnitude, 1f);
-            cameraAnchor.localPosition = new Vector3(0f, bobOffset, 0f);
+            float target = 0f;
+            if (input.magnitude > 0.1f && controller.isGrounded)
+                target = Mathf.Sin(bobTimer) * bobAmplitude;
+            cameraBob.localPosition = Vector3.Lerp(cameraBob.localPosition, new Vector3(0f, target, 0f), Time.deltaTime * bobFrequency);
         }
 
         if (jumpAction.WasPressedThisFrame() && controller.isGrounded)

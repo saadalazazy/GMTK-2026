@@ -378,15 +378,6 @@ public class SharkEnemy : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
-    {
-        if (boat != null)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(boat.position, 30f);
-        }
-    }
-
     void OnGUI()
     {
         if (!Debug.isDebugBuild) return;

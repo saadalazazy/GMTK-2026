@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 209802161684853523}
   - component: {fileID: 37875445007548831}
   - component: {fileID: 3326321476291923970}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Harpoon Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

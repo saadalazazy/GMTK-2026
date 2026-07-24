@@ -134,7 +134,7 @@ public class OceanGenerator : MonoBehaviour
 
     void PlaceRocks(Transform chunkParent, int chunkIndex)
     {
-        if (chunkIndex == startChunkIndex) return;
+        if (chunkIndex <= startChunkIndex + viewDistance) return;
 
         float chunkStartZ = chunkIndex * chunkLength;
         float rowCount = Mathf.Floor(chunkLength / rowSpacing);

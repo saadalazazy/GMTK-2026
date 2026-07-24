@@ -36,6 +36,9 @@ public class PlayerCore : MonoBehaviour
     [Header("Utils")]
     public Transform handMesh;
 
+    [Header("Boat")]
+    [SerializeField] private Rigidbody boatRigidbody;
+
     [HideInInspector] public bool inputEnabled = true;
 
 
@@ -63,6 +66,12 @@ public class PlayerCore : MonoBehaviour
         audioSource = gameObject.AddComponent<AudioSource>();
         Cursor.lockState = CursorLockMode.Locked;
 
+        if (boatRigidbody == null)
+        {
+            var boat = FindFirstObjectByType<WaterFloat>();
+            if (boat != null) boatRigidbody = boat.GetComponent<Rigidbody>();
+        }
+
         var gameplay = actions.FindActionMap("Player");
         moveAction = gameplay.FindAction("Move");
         lookAction = gameplay.FindAction("Look");
@@ -81,18 +90,15 @@ public class PlayerCore : MonoBehaviour
     void OnEnable()
     {
         handMesh.gameObject.SetActive(true);
-        velocity = Vector3.zero;
+
+        controller.enabled = false;
+        controller.enabled = true;
     }
 
     void Update()
     {
-        HandleMovement();
-    }
-
-    void LateUpdate()
-    {
-        if (!inputEnabled) return;
         HandleLook();
+        HandleMovement();
     }
 
     void HandleMovement()
@@ -141,10 +147,9 @@ public class PlayerCore : MonoBehaviour
         if (jumpAction.WasPressedThisFrame() && controller.isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
-        if (!inputEnabled)
-            move = Vector3.zero;
-
         // 6. Character Controller movement execution
+        Vector3 boatVelocity = boatRigidbody != null ? boatRigidbody.linearVelocity : Vector3.zero;
+
         controller.Move((move * currentSpeed + velocity) * Time.deltaTime);
     }
 

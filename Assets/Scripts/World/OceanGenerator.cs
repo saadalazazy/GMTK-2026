@@ -25,6 +25,8 @@ public class OceanGenerator : MonoBehaviour
     private int startChunkIndex;
     private Dictionary<int, GameObject> spawnedChunks = new Dictionary<int, GameObject>();
 
+    public bool showGizmos = false;
+
     void Start()
     {
         var playerCore = FindFirstObjectByType<PlayerCore>();
@@ -119,6 +121,8 @@ public class OceanGenerator : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (!showGizmos) return;
+
         Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
         foreach (var kvp in spawnedChunks)
         {

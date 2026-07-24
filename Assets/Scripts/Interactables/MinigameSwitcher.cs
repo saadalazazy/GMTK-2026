@@ -46,7 +46,7 @@ public class MinigameSwitcher : MonoBehaviour
         if (isInMinigame)
         {
             PlayerCore playerCore = FindFirstObjectByType<PlayerCore>();
-            playerCore.inputEnabled = false;
+            playerCore.enabled = false;
             playerCore.GetComponent<InteractionManager>().enabled = false;
 
             targetCamera.Priority = 20;
@@ -54,7 +54,7 @@ public class MinigameSwitcher : MonoBehaviour
         else
         {
             PlayerCore playerCore = FindFirstObjectByType<PlayerCore>();
-            playerCore.inputEnabled = true;
+            playerCore.enabled = true;
             playerCore.GetComponent<InteractionManager>().enabled = true;
 
             targetCamera.Priority = -1;

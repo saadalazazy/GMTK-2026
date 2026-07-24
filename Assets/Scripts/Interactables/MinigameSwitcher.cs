@@ -65,6 +65,5 @@ public class MinigameSwitcher : MonoBehaviour
             onMinigameStart.Invoke();
         else
             onMinigameEnd.Invoke();
-
     }
 }

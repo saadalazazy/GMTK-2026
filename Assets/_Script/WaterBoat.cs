@@ -128,7 +128,7 @@ public class WaterBoat : MonoBehaviour
         //Camera.transform.position = Vector3.SmoothDamp(Camera.transform.position, transform.position + transform.forward * -8f + transform.up * 2f, ref CamVel, 0.05f);
 
         //Audio crossfade based on actual movement
-        bool isMoving = Rigidbody.linearVelocity.magnitude > 0.2f;
+        bool isMoving = Rigidbody.linearVelocity.magnitude > 1f;
         float targetIdle = isMoving ? 0f : 1f;
         float targetMoving = isMoving ? 1f : 0f;
         idleSource.volume = Mathf.MoveTowards(idleSource.volume, targetIdle, audioFadeSpeed * Time.fixedDeltaTime);

@@ -62,7 +62,6 @@ public class PlayerCore : MonoBehaviour
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
         audioSource = gameObject.AddComponent<AudioSource>();
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -89,6 +88,7 @@ public class PlayerCore : MonoBehaviour
 
     void OnEnable()
     {
+        controller = GetComponent<CharacterController>();
         handMesh.gameObject.SetActive(true);
 
         controller.enabled = false;

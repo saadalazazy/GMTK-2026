@@ -112,17 +112,17 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnvironmentReflections: 1
     - _ExcludeFromTUAndAA: 0
-    - _FoamOffset: 2.13
-    - _Gloss: 4.94
+    - _FoamOffset: -22.16
+    - _Gloss: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _MaterialID: 1
     - _MaterialTypeMask: 2
-    - _Metallic: 0.27
+    - _Metallic: 20
     - _NormalSpeed: 0.05
-    - _NormalStrength: 4.12
-    - _NormalStrength_2: 0.09
+    - _NormalStrength: -3.29
+    - _NormalStrength_2: -0.7
     - _OcclusionStrength: 1
     - _OpaqueCullMode: 2
     - _Parallax: 0.005
@@ -136,9 +136,9 @@ Material:
     - _RefractionModel: 0
     - _RenderQueueType: 3
     - _RequireSplitLighting: 0
-    - _RipplesDissolve: 19.6
-    - _RipplesScale: 20.13
-    - _SimpleNoise: 9.84
+    - _RipplesDissolve: 15.5
+    - _RipplesScale: 21.6
+    - _SimpleNoise: 11.22
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -158,7 +158,7 @@ Material:
     - _Surface: 0
     - _SurfaceType: 1
     - _TransmissionEnable: 1
-    - _Transparency: 0.05
+    - _Transparency: 0
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
@@ -174,14 +174,14 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.26663578, g: 0.5068639, b: 0.82641506, a: 1}
-    - _Base_Color: {r: 0, g: 0.018341288, b: 0.16981131, a: 0}
+    - _Base_Color: {r: 0.011330403, g: 0, b: 0.11320752, a: 1}
     - _Color: {r: 0.26663572, g: 0.50686383, b: 0.82641506, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _FoamColor: {r: 0, g: 0.0011873686, b: 0.01886791, a: 0.9254902}
+    - _FoamColor: {r: 0.037507236, g: 0.009611958, b: 0.2264151, a: 1}
     - _MeshOrigin: {r: 3.78, g: 2, b: 0, a: 0}
     - _NormalSpeed: {r: 0, g: 0, b: 0, a: 0}
-    - _RipplesColor: {r: 0.011258458, g: 0.046655573, b: 0.103773594, a: 0}
+    - _RipplesColor: {r: 0.01935742, g: 0.01935742, b: 0.047169805, a: 0}
     - _RipplesSpeed: {r: 5, g: 10, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Wave0: {r: 0, g: 0, b: 0, a: 0}

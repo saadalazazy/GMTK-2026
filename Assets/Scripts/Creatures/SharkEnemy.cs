@@ -303,7 +303,9 @@ public class SharkEnemy : MonoBehaviour
         awayDir.y = 0f;
         awayDir.Normalize();
 
-        transform.position += awayDir * fleeSpeed * Time.deltaTime;
+        Vector3 pos = transform.position + awayDir * fleeSpeed * Time.deltaTime;
+        pos.y = Mathf.Lerp(pos.y, teleportDepth, Time.deltaTime * 3f);
+        transform.position = pos;
         FaceDirection(awayDir);
 
         if (stateTimer >= fleeDuration)

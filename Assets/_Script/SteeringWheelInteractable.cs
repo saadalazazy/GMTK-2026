@@ -56,12 +56,13 @@ public class SteeringWheelInteractable : MonoBehaviour
 
         Vector2 input = moveAction.action.ReadValue<Vector2>();
 
-        boat.SteerInput = input.x;
+        var reverse = input.y < 0f ? -1f : 1f;
+
+        boat.SteerInput = -input.x * reverse;
         boat.ThrottleInput = input.y;
 
-        SmoothWheelVisual(input.x);
+        SmoothWheelVisual(input.x * reverse);
     }
-
     /// <summary>
     /// Smoothly rotates the wheel mesh toward a target angle based on steer input,
     /// so it doesn't snap instantly like a real wheel wouldn't.

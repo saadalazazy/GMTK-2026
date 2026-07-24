@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,6 +19,7 @@ public class MinigameSwitcher : MonoBehaviour
 
     void Start()
     {
+        isInMinigame = false;
         var gameplay = actions.FindActionMap("Player");
         interactAction = gameplay.FindAction("Interact");
     }
@@ -32,31 +34,28 @@ public class MinigameSwitcher : MonoBehaviour
 
     public void ToggleMinigame()
     {
-        isInMinigame = !isInMinigame;
+        StartCoroutine(ToggleMinigameCoroutine());
+    }
 
+    private IEnumerator ToggleMinigameCoroutine()
+    {
+        isInMinigame = !isInMinigame;
+        print("Minigame state changed: " + isInMinigame);
+
+        yield return null;
         if (isInMinigame)
         {
-            // Find player core and disable it
             PlayerCore playerCore = FindFirstObjectByType<PlayerCore>();
-            if (playerCore != null)
-            {
-                playerCore.enabled = false;
-            }
-
-            playerCore.transform.GetComponent<InteractionManager>().enabled = false;
+            playerCore.inputEnabled = false;
+            playerCore.GetComponent<InteractionManager>().enabled = false;
 
             targetCamera.Priority = 20;
         }
         else
         {
-            // Find player core and enable it
             PlayerCore playerCore = FindFirstObjectByType<PlayerCore>();
-            if (playerCore != null)
-            {
-                playerCore.enabled = true;
-            }
-            playerCore.transform.GetComponent<InteractionManager>().enabled = true;
-
+            playerCore.inputEnabled = true;
+            playerCore.GetComponent<InteractionManager>().enabled = true;
 
             targetCamera.Priority = -1;
         }
@@ -65,5 +64,6 @@ public class MinigameSwitcher : MonoBehaviour
             onMinigameStart.Invoke();
         else
             onMinigameEnd.Invoke();
+
     }
 }

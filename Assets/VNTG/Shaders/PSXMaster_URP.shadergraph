@@ -2704,8 +2704,8 @@
     "m_ObjectId": "055bf941888a4edc9dc6904244e5667a",
     "m_Title": "Normal UV",
     "m_Position": {
-        "x": -2925.0,
-        "y": 826.0
+        "x": -2924.999755859375,
+        "y": 825.9999389648438
     }
 }
 
@@ -3075,8 +3075,8 @@
     "m_ObjectId": "0ed34102eb524004bd08c2c98ebe789e",
     "m_Title": "Sample Texture",
     "m_Position": {
-        "x": -1330.0,
-        "y": 775.0
+        "x": -1329.9998779296875,
+        "y": 774.9999389648438
     }
 }
 
@@ -4654,7 +4654,7 @@
     "m_ObjectId": "34e4f432840e4c159f88c662de89fdf2",
     "m_Title": "Vertex Shading",
     "m_Position": {
-        "x": 914.0,
+        "x": 913.9998168945313,
         "y": 175.0
     }
 }
@@ -5682,8 +5682,8 @@
     "m_ObjectId": "4b1df5429e1f47a68fd89d4c6ee4cff5",
     "m_Title": "Vertex Snapping",
     "m_Position": {
-        "x": -73.0,
-        "y": -1294.0
+        "x": -73.00003051757813,
+        "y": -1293.9998779296875
     }
 }
 
@@ -7104,7 +7104,7 @@
     "m_ObjectId": "6c977b97318343bfb63e55f90b2eec04",
     "m_Title": "Gouraud Shading",
     "m_Position": {
-        "x": 259.0,
+        "x": 258.9999694824219,
         "y": -681.0
     }
 }
@@ -8080,7 +8080,7 @@
     "m_Title": "Vertex Colors",
     "m_Position": {
         "x": -608.0,
-        "y": 397.0
+        "y": 396.9999694824219
     }
 }
 
@@ -8350,8 +8350,8 @@
     "m_ObjectId": "889e91e219774f08be23c61347fdb9fc",
     "m_Title": "Color Quantization",
     "m_Position": {
-        "x": -138.0,
-        "y": 826.0
+        "x": -138.00001525878907,
+        "y": 825.9999389648438
     }
 }
 
@@ -8734,7 +8734,7 @@
     "m_Title": "Shadow Pass Correction",
     "m_Position": {
         "x": 1033.0,
-        "y": -1520.0
+        "y": -1519.9998779296875
     }
 }
 
@@ -9639,8 +9639,8 @@
     "m_ObjectId": "a9965c48c7724d7a95128b96f97b049e",
     "m_Title": "Lit Shading",
     "m_Position": {
-        "x": 389.0,
-        "y": 1017.0
+        "x": 388.99993896484377,
+        "y": 1016.9998779296875
     }
 }
 
@@ -9700,8 +9700,8 @@
     "m_ObjectId": "acc849cb1f2440a18f70e5dcedc95de7",
     "m_Title": "Downsample UV",
     "m_Position": {
-        "x": -3238.0,
-        "y": 1127.0
+        "x": -3237.999755859375,
+        "y": 1126.9998779296875
     }
 }
 
@@ -10386,8 +10386,8 @@
     "m_ObjectId": "ba5c4c348db7484d81be0cf63929a6c0",
     "m_Title": "Final UV",
     "m_Position": {
-        "x": -1796.0,
-        "y": 1124.0
+        "x": -1795.999755859375,
+        "y": 1123.9998779296875
     }
 }
 
@@ -12524,8 +12524,8 @@
     "m_ObjectId": "e1f637c38fc244649101f01c427de86d",
     "m_Title": "Affine Texture Mapping",
     "m_Position": {
-        "x": -2869.0,
-        "y": -854.0
+        "x": -2868.999755859375,
+        "y": -853.9999389648438
     }
 }
 

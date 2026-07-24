@@ -22,6 +22,7 @@ public class OceanGenerator : MonoBehaviour
 
     private Transform player;
     private int lastChunkIndex;
+    private int startChunkIndex;
     private Dictionary<int, GameObject> spawnedChunks = new Dictionary<int, GameObject>();
 
     void Start()
@@ -32,6 +33,7 @@ public class OceanGenerator : MonoBehaviour
         if (player != null)
         {
             lastChunkIndex = GetChunkIndex(player.position.z);
+            startChunkIndex = lastChunkIndex;
             GenerateInitialChunks();
         }
     }
@@ -128,6 +130,8 @@ public class OceanGenerator : MonoBehaviour
 
     void PlaceRocks(Transform chunkParent, int chunkIndex)
     {
+        if (chunkIndex == startChunkIndex) return;
+
         float chunkStartZ = chunkIndex * chunkLength;
         float rowCount = Mathf.Floor(chunkLength / rowSpacing);
         int rockCount = Random.Range(minRocksPerChunk, maxRocksPerChunk + 1);

@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4470091819846746079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5584005155015839963}
+  - component: {fileID: 1260057304703761478}
+  m_Layer: 0
+  m_Name: WorldGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5584005155015839963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470091819846746079}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 36.12442, y: 0.39868, z: -6.26184}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1260057304703761478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470091819846746079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac90c4ca45655d941882fcc2305ffac7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OceanGenerator
+  chunkLength: 50
+  chunkWidth: 50
+  viewDistance: 3
+  waterPrefab: {fileID: 8849270808253518514, guid: 485081bee442a807d9cd3fd981a734a5, type: 3}
+  rockPrefabs:
+  - {fileID: 1170932458222162837, guid: 0eb24b6ffe36d8ffdbb3671b3803658d, type: 3}
+  - {fileID: 9064234641323245149, guid: c2716cf29e70874648f4b4af5d3625df, type: 3}
+  - {fileID: 2239341270282046008, guid: d82b5f9086cbfd77fb65d5aec526dff9, type: 3}
+  - {fileID: 5000015250269227873, guid: 176d59df91dd6c119883e9b7d7ac9ab2, type: 3}
+  minRocksPerChunk: 3
+  maxRocksPerChunk: 7
+  rowSpacing: 20
+  lanes: 4
+  minRockScale: 0.65
+  maxRockScale: 1.2

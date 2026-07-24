@@ -30,12 +30,13 @@ public class WaterFloat : MonoBehaviour
     public Vector3 Center { get { return transform.position + centerOffset; } }
 
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         //get components
         Waves = FindObjectOfType<Waves>();
         Rigidbody = GetComponent<Rigidbody>();
         Rigidbody.useGravity = false;
+        Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
         //compute center
         WaterLinePoints = new Vector3[FloatPoints.Length];

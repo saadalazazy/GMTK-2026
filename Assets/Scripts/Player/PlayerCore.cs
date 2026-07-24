@@ -36,6 +36,8 @@ public class PlayerCore : MonoBehaviour
     [Header("Utils")]
     public Transform handMesh;
 
+    [HideInInspector] public bool inputEnabled = true;
+
 
     private CharacterController controller;
     private AudioSource audioSource;
@@ -73,16 +75,23 @@ public class PlayerCore : MonoBehaviour
     void OnDisable()
     {
         handMesh.gameObject.SetActive(false);
+        velocity = Vector3.zero;
     }
 
     void OnEnable()
     {
         handMesh.gameObject.SetActive(true);
+        velocity = Vector3.zero;
     }
 
     void Update()
     {
         HandleMovement();
+    }
+
+    void LateUpdate()
+    {
+        if (!inputEnabled) return;
         HandleLook();
     }
 
@@ -131,6 +140,9 @@ public class PlayerCore : MonoBehaviour
         // 5. Jump logic
         if (jumpAction.WasPressedThisFrame() && controller.isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+        if (!inputEnabled)
+            move = Vector3.zero;
 
         // 6. Character Controller movement execution
         controller.Move((move * currentSpeed + velocity) * Time.deltaTime);

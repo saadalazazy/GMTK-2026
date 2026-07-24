@@ -17,6 +17,8 @@ public class Lighthouse : MonoBehaviour
     public float fadeDuration = 30f;
     public Color fadeColor = new Color(0.5f, 0f, 0f);
 
+    [SerializeField] private Transform target;
+
     private float lockedX;
     private float lockedY;
     private bool hasArrived;
@@ -44,12 +46,9 @@ public class Lighthouse : MonoBehaviour
 
     void HandleMovement()
     {
-        var player = FindFirstObjectByType<PlayerCore>();
-        if (player == null) return;
-
         if (hasArrived) return;
 
-        float targetZ = player.transform.position.z + zOffset;
+        float targetZ = target.position.z + zOffset;
 
         transform.position = new Vector3(lockedX, lockedY, targetZ);
     }

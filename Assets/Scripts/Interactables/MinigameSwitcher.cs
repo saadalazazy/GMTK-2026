@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 public class MinigameSwitcher : MonoBehaviour
 {
     [SerializeField] private CinemachineCamera targetCamera;
+    [SerializeField] private float cooldownDuration = 0.5f;
 
     public UnityEvent onMinigameStart;
     public UnityEvent onMinigameEnd;
@@ -14,6 +15,7 @@ public class MinigameSwitcher : MonoBehaviour
     public InputActionAsset actions;
 
     private bool isInMinigame = false;
+    private bool cooldownActive = false;
     InputAction interactAction;
 
 
@@ -26,6 +28,7 @@ public class MinigameSwitcher : MonoBehaviour
 
     public void Update()
     {
+        if (cooldownActive) return;
         if (isInMinigame && interactAction.WasPressedThisFrame())
         {
             ToggleMinigame();
@@ -39,7 +42,10 @@ public class MinigameSwitcher : MonoBehaviour
 
     private IEnumerator ToggleMinigameCoroutine()
     {
+        cooldownActive = true;
         isInMinigame = !isInMinigame;
+
+        print("Minigame state changed: " + isInMinigame);
 
         yield return null;
         if (isInMinigame)
@@ -64,5 +70,7 @@ public class MinigameSwitcher : MonoBehaviour
         else
             onMinigameEnd.Invoke();
 
+        yield return new WaitForSeconds(cooldownDuration);
+        cooldownActive = false;
     }
 }

@@ -34,6 +34,8 @@ public class WaterBoat : MonoBehaviour
     [SerializeField] private float impactShakeStrength = 1.5f;
     [SerializeField] private float impactCooldown = 0.4f;
     [SerializeField] private float impactPushbackForce = 8f;
+    [SerializeField] private EngienManager engienManager;
+
 
     // -1..1: steer left/right. Set externally when UseKeyboardInput is false.
     public float SteerInput { get; set; }
@@ -52,6 +54,7 @@ public class WaterBoat : MonoBehaviour
 
     //internal Properties
     protected Vector3 CamVel;
+    private bool engienFire;
 
     public void Awake()
     {
@@ -82,7 +85,25 @@ public class WaterBoat : MonoBehaviour
     {
         if (UseKeyboardInput)
             ReadKeyboardInput();
+        if (engienManager != null && engienManager.HasActiveFires)
+        {
+            // Block new movement input.
+            SteerInput = 0f;
+            ThrottleInput = 0f;
 
+            // Stop the boat immediately.
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+
+            // Stop visual and audio movement feedback.
+            if (ParticleSystem != null)
+                ParticleSystem.Pause();
+
+            idleSource.volume = 1f;
+            movingSource.volume = 0f;
+
+            return; // Do not apply steering or engine force while there is a fire.
+        }
         //steer direction, clamp to [-1, 1] in case something feeds bad values
         var steer = Mathf.Clamp(SteerInput, -1f, 1f);
 
@@ -129,6 +150,8 @@ public class WaterBoat : MonoBehaviour
 
         //Audio crossfade based on actual movement
         bool isMoving = Rigidbody.linearVelocity.magnitude > 1f;
+        engienManager.SetBoatMoving(isMoving);
+        
         float targetIdle = isMoving ? 0f : 1f;
         float targetMoving = isMoving ? 1f : 0f;
         idleSource.volume = Mathf.MoveTowards(idleSource.volume, targetIdle, audioFadeSpeed * Time.fixedDeltaTime);

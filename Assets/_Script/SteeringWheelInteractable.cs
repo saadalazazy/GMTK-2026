@@ -1,15 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
-/// <summary>
-/// Goes on the same GameObject as your BaseInteractable (the steering wheel).
-/// The first Interact starts the minigame via MinigameSwitcher (which locks the
-/// player and swaps the camera). From then on MinigameSwitcher itself watches for
-/// the next Interact press to end it. This script listens to
-/// onMinigameStart/onMinigameEnd and drives the boat's SteerInput/ThrottleInput
-/// from the shared Move action while driving, and smoothly rotates the wheel
-/// mesh on its Y axis to visually match the steering input.
-/// </summary>
 [RequireComponent(typeof(BaseInteractable))]
 public class SteeringWheelInteractable : MonoBehaviour
 {
@@ -17,23 +9,38 @@ public class SteeringWheelInteractable : MonoBehaviour
     [SerializeField] private InputActionReference moveAction;
 
     [Header("Wheel Visual Rotation")]
-    [Tooltip("The transform that actually spins (can be this object or a child mesh).")]
     [SerializeField] private Transform wheelTransform;
-    [Tooltip("Max rotation angle in degrees when steering fully left/right.")]
+    [SerializeField] private Transform forwardHandle;
+    [SerializeField] private Transform backwardHandle;
     [SerializeField] private float maxWheelAngle = 90f;
-    [Tooltip("How quickly the wheel rotates toward its target angle (higher = snappier).")]
-    [SerializeField] private float rotationSmoothSpeed = 6f;
+    [SerializeField] private float wheelTurnDuration = 0.18f;
+    [SerializeField] private float handleTurnDuration = 0.15f;
 
     private bool isDriving;
-    private float currentWheelAngle;
-    private float wheelAngleVelocity; // used by SmoothDamp
+
+    private Quaternion wheelStartRotation;
+    private Quaternion forwardHandleStartRotation;
+    private Quaternion backwardHandleStartRotation;
+
+    private Tween wheelTween;
+    private Tween forwardHandleTween;
+    private Tween backwardHandleTween;
+
+    private float lastSteerInput;
+    private float lastThrottleInput;
 
     private void Awake()
     {
-        var baseInteractable = GetComponent<BaseInteractable>();
-
         if (wheelTransform == null)
             wheelTransform = transform;
+
+        wheelStartRotation = wheelTransform.localRotation;
+
+        if (forwardHandle != null)
+            forwardHandleStartRotation = forwardHandle.localRotation;
+
+        if (backwardHandle != null)
+            backwardHandleStartRotation = backwardHandle.localRotation;
     }
 
     public void StartDriving()
@@ -44,44 +51,93 @@ public class SteeringWheelInteractable : MonoBehaviour
     public void StopDriving()
     {
         isDriving = false;
+
+        if (boat != null)
+        {
+            boat.SteerInput = 0f;
+            boat.ThrottleInput = 0f;
+        }
+
+        AnimateWheel(0f);
+        AnimateHandles(0f);
     }
 
     private void Update()
     {
         if (!isDriving || boat == null || moveAction == null)
-        {
-            SmoothWheelVisual(0f);
             return;
-        }
 
         Vector2 input = moveAction.action.ReadValue<Vector2>();
 
-        var reverse = input.y < 0f ? -1f : 1f;
-
-        boat.SteerInput = -input.x * reverse;
+        boat.SteerInput = -input.x;
         boat.ThrottleInput = input.y;
 
-        SmoothWheelVisual(input.x * reverse);
+        // Only start a new tween when input changes noticeably.
+        if (Mathf.Abs(input.x - lastSteerInput) > 0.01f)
+        {
+            AnimateWheel(input.x);
+            lastSteerInput = input.x;
+        }
+
+        if (Mathf.Abs(input.y - lastThrottleInput) > 0.01f)
+        {
+            AnimateHandles(input.y);
+            lastThrottleInput = input.y;
+        }
     }
-    /// <summary>
-    /// Smoothly rotates the wheel mesh toward a target angle based on steer input,
-    /// so it doesn't snap instantly like a real wheel wouldn't.
-    /// </summary>
-    private void SmoothWheelVisual(float steerInput)
+
+    private void AnimateWheel(float steerInput)
     {
+        if (wheelTransform == null)
+            return;
+
+        wheelTween?.Kill();
+
         float targetAngle = steerInput * maxWheelAngle;
 
-        currentWheelAngle = Mathf.SmoothDamp(
-            currentWheelAngle,
-            targetAngle,
-            ref wheelAngleVelocity,
-            1f / rotationSmoothSpeed
-        );
+        Quaternion targetRotation =
+            wheelStartRotation * Quaternion.AngleAxis(-targetAngle, Vector3.right);
 
-        if (wheelTransform != null)
+        wheelTween = wheelTransform
+            .DOLocalRotateQuaternion(targetRotation, wheelTurnDuration)
+            .SetEase(Ease.OutCubic);
+    }
+
+    private void AnimateHandles(float throttleInput)
+    {
+        const float handleAngle = 45f;
+
+        if (forwardHandle != null)
         {
-            Vector3 euler = wheelTransform.localEulerAngles;
-            wheelTransform.localRotation = Quaternion.Euler(euler.x, currentWheelAngle, euler.z);
+            forwardHandleTween?.Kill();
+
+            float forwardAngle = Mathf.Max(0f, throttleInput) * handleAngle;
+            Quaternion target = forwardHandleStartRotation *
+                                Quaternion.AngleAxis(forwardAngle, Vector3.up);
+
+            forwardHandleTween = forwardHandle
+                .DOLocalRotateQuaternion(target, handleTurnDuration)
+                .SetEase(Ease.OutBack);
         }
+
+        if (backwardHandle != null)
+        {
+            backwardHandleTween?.Kill();
+
+            float backwardAngle = Mathf.Min(0f, throttleInput) * handleAngle;
+            Quaternion target = backwardHandleStartRotation *
+                                Quaternion.AngleAxis(backwardAngle, Vector3.up);
+
+            backwardHandleTween = backwardHandle
+                .DOLocalRotateQuaternion(target, handleTurnDuration)
+                .SetEase(Ease.OutBack);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        wheelTween?.Kill();
+        forwardHandleTween?.Kill();
+        backwardHandleTween?.Kill();
     }
 }

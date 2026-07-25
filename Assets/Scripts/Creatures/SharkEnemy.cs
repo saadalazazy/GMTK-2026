@@ -50,6 +50,10 @@ public class SharkEnemy : MonoBehaviour
     [Header("Damage")]
     [SerializeField] private float damageAmount = 25f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip damageSound;
+
     [Header("Events")]
     public UnityEvent OnAttack;
     public UnityEvent OnDeath;
@@ -321,6 +325,11 @@ public class SharkEnemy : MonoBehaviour
     {
         if (currentState == SharkState.Dead) return;
 
+        if (damageSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(damageSound);
+        }
+
         if (!useHealth)
         {
             ScareAway();
@@ -340,6 +349,7 @@ public class SharkEnemy : MonoBehaviour
         {
             ScareAway();
         }
+
     }
 
     public void ScareAway()

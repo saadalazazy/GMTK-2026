@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -58,7 +59,7 @@ public class PlayerCore : MonoBehaviour
     private Vector2 handSpringVelocity;
     private Vector3 bobVelocity;
 
-
+    public TyperwriterText typerwriterText { get; private set; }
 
     void Start()
     {
@@ -78,6 +79,9 @@ public class PlayerCore : MonoBehaviour
         sprintAction = gameplay.FindAction("Sprint");
 
         gameplay.Enable();
+
+        typerwriterText = FindFirstObjectByType<TyperwriterText>();
+        typerwriterText.StartTyping("Move towards the lighthouse");
     }
 
     void OnDisable()
@@ -190,7 +194,7 @@ public class PlayerCore : MonoBehaviour
     void PlayFootstep()
     {
         if (footstepClips == null || footstepClips.Length == 0) return;
-        audioSource.pitch = Random.Range(0.9f, 1.1f);
-        audioSource.PlayOneShot(footstepClips[Random.Range(0, footstepClips.Length)], footstepVolume);
+        audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(footstepClips[UnityEngine.Random.Range(0, footstepClips.Length)], footstepVolume);
     }
 }

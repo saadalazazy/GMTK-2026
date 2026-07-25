@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class InteractionManager : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class InteractionManager : MonoBehaviour
     IInteractable currentTarget;
 
     [SerializeField] private Transform heldItemAnchor;
+
+    [SerializeField] private Image crosshairImage;
+
+    [SerializeField] private Sprite defaultCrosshair;
+    [SerializeField] private Sprite interactCrosshair;
 
     BaseHeldItem currentHeldItem;
 
@@ -74,5 +80,7 @@ public class InteractionManager : MonoBehaviour
             if (currentTarget != null)
                 currentTarget.OnItemEnter(gameObject);
         }
+
+        crosshairImage.sprite = currentTarget != null ? interactCrosshair : defaultCrosshair;
     }
 }

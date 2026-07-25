@@ -151,15 +151,17 @@ public class WaterBoat : MonoBehaviour
         //Audio crossfade based on actual movement
         bool isMoving = Rigidbody.linearVelocity.magnitude > 1f;
         engienManager.SetBoatMoving(isMoving);
-        
-        float targetIdle = isMoving ? 0f : 1f;
-        float targetMoving = isMoving ? 1f : 0f;
+
+        float targetIdle = isMoving ? 0f : 0.1f;
+        float targetMoving = isMoving ? 0.1f : 0f;
         idleSource.volume = Mathf.MoveTowards(idleSource.volume, targetIdle, audioFadeSpeed * Time.fixedDeltaTime);
         movingSource.volume = Mathf.MoveTowards(movingSource.volume, targetMoving, audioFadeSpeed * Time.fixedDeltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.CompareTag("Player")) return;
+
         if (Time.time - lastImpactTime < impactCooldown) return;
 
         float force = collision.relativeVelocity.magnitude;

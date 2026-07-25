@@ -13,6 +13,9 @@ public class Lighthouse : MonoBehaviour
     public Color flashColor = new Color(1f, 0.9f, 0.3f);
     public float emissionIntensity = 2f;
 
+    [Header("Rotation")]
+    public float rotationSpeed = 45f;
+
     [Header("Fade")]
     public float fadeDuration = 30f;
     public Color fadeColor = new Color(0.5f, 0f, 0f);
@@ -42,6 +45,7 @@ public class Lighthouse : MonoBehaviour
     {
         HandleMovement();
         HandleFlash();
+        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
     }
 
     void HandleMovement()

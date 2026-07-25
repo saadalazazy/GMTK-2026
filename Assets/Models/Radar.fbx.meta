@@ -1,44 +1,9 @@
 fileFormatVersion: 2
-guid: 01f1a00ff6d5100dc8cf4dedb27e734c
+guid: f3de5b9186e1947c6a364c95f95087d9
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Fence
-    second: {fileID: 2100000, guid: c5deec69ccb25883d96c7d6fd7bba495, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Holder
-    second: {fileID: 2100000, guid: 3245f24fb4428ca648f24fc34db6efd3, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: House
-    second: {fileID: 2100000, guid: c84ab0a82a070905a975dc98cb9013a9, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Light House Base
-    second: {fileID: 2100000, guid: a243b4a361fdad61f9f1d24e10701e65, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Roof
-    second: {fileID: 2100000, guid: 4ca39295ac4741f6fa1ea340d9794732, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Stairs
-    second: {fileID: 2100000, guid: 755632c5625788cb186468b87ba4202a, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Tomb
-    second: {fileID: 2100000, guid: 516a4e612bec32d498caf30b1b17f8d7, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -126,7 +91,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.01
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

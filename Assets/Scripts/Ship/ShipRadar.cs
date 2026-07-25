@@ -68,7 +68,6 @@ public class ShipRadar : MonoBehaviour
     private void ScanSurroundings()
     {
         Collider[] targets = Physics.OverlapSphere(transform.position, radarRange, detectableLayers);
-        activeBlips.RemoveAll(b => b.worldTarget == null);
 
         foreach (var col in targets)
         {
@@ -94,17 +93,25 @@ public class ShipRadar : MonoBehaviour
 
     private void UpdateBlips()
     {
-        foreach (var blip in activeBlips)
+        List<int> toRemove = new List<int>();
+
+        for (int i = activeBlips.Count - 1; i >= 0; i--)
         {
+            RadarBlip blip = activeBlips[i];
+
+            bool outOfRange = blip.worldTarget == null ||
+                transform.InverseTransformPoint(blip.worldTarget.position).magnitude / radarRange > 1.0f;
+
+            if (outOfRange)
+            {
+                Destroy(blip.uiIcon.gameObject);
+                toRemove.Add(i);
+                continue;
+            }
+
             Vector3 relativePos = transform.InverseTransformPoint(blip.worldTarget.position);
             Vector2 radarPos = new Vector2(relativePos.x, relativePos.z);
             float normalizedDistance = radarPos.magnitude / radarRange;
-
-            if (normalizedDistance > 1.0f)
-            {
-                blip.uiIcon.gameObject.SetActive(false);
-                continue;
-            }
 
             blip.uiIcon.gameObject.SetActive(true);
             blip.uiIcon.anchorMin = new Vector2(0.5f, 0.5f);
@@ -123,6 +130,11 @@ public class ShipRadar : MonoBehaviour
             {
                 blip.canvasGroup.alpha = Mathf.MoveTowards(blip.canvasGroup.alpha, 0f, blipFadeOutSpeed * Time.deltaTime);
             }
+        }
+
+        foreach (int i in toRemove)
+        {
+            activeBlips.RemoveAt(i);
         }
     }
 

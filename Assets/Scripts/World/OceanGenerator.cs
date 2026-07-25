@@ -20,6 +20,10 @@ public class OceanGenerator : MonoBehaviour
     [SerializeField] private float minRockScale = 0.8f;
     [SerializeField] private float maxRockScale = 1.5f;
 
+    [Header("Lighthouse")]
+    [SerializeField] private GameObject lighthouseChunkPrefab;
+    [SerializeField] private int lighthouseChunkIndex = 30;
+
     private Transform player;
     private int lastChunkIndex;
     private int startChunkIndex;
@@ -63,7 +67,13 @@ public class OceanGenerator : MonoBehaviour
     {
         for (int i = lastChunkIndex - 1; i <= lastChunkIndex + viewDistance; i++)
         {
+            if (i >= lighthouseChunkIndex) break;
             SpawnChunk(i);
+        }
+
+        if (lighthouseChunkIndex >= lastChunkIndex - 1 && !spawnedChunks.ContainsKey(lighthouseChunkIndex))
+        {
+            SpawnChunk(lighthouseChunkIndex);
         }
     }
 
@@ -71,10 +81,16 @@ public class OceanGenerator : MonoBehaviour
     {
         for (int i = lastChunkIndex; i <= lastChunkIndex + viewDistance; i++)
         {
+            if (i >= lighthouseChunkIndex) break;
             if (!spawnedChunks.ContainsKey(i))
             {
                 SpawnChunk(i);
             }
+        }
+
+        if (!spawnedChunks.ContainsKey(lighthouseChunkIndex))
+        {
+            SpawnChunk(lighthouseChunkIndex);
         }
     }
 
@@ -104,6 +120,14 @@ public class OceanGenerator : MonoBehaviour
 
         float chunkStartZ = index * chunkLength;
         Vector3 chunkCenter = new Vector3(0f, 0f, chunkStartZ + chunkLength * 0.5f);
+
+        if (index == lighthouseChunkIndex && lighthouseChunkPrefab != null)
+        {
+            GameObject lighthouseChunk = Instantiate(lighthouseChunkPrefab, chunkCenter, Quaternion.identity);
+            lighthouseChunk.name = $"Chunk_Lighthouse_{index}";
+            spawnedChunks[index] = lighthouseChunk;
+            return;
+        }
 
         GameObject chunkObj = new GameObject($"Chunk_{index}");
         chunkObj.transform.position = chunkCenter;

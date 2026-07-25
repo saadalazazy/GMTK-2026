@@ -40,7 +40,6 @@ public class MinigameSwitcher : MonoBehaviour
     private IEnumerator ToggleMinigameCoroutine()
     {
         isInMinigame = !isInMinigame;
-        print("Minigame state changed: " + isInMinigame);
 
         yield return null;
         if (isInMinigame)

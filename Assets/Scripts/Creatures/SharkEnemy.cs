@@ -15,9 +15,11 @@ public class SharkEnemy : MonoBehaviour
     [Header("Idle / Tracking")]
     [SerializeField] private float idleObserveTime = 4f;
     [SerializeField] private float idleSpeedThreshold = 0.5f;
-    [SerializeField] private float teleportMinDist = 25f;
-    [SerializeField] private float teleportMaxDist = 45f;
-    [SerializeField] private float teleportDepth = -5f;
+    [SerializeField] private float repositionMinDist = 25f;
+    [SerializeField] private float repositionMaxDist = 45f;
+    [SerializeField] private float repositionDepth = -5f;
+    [SerializeField] private float repositionSpeed = 40f;
+    [SerializeField] private float repositionArrivalDist = 2f;
 
     [Header("Orbit")]
     [SerializeField] private float orbitSpeed = 0.08f;
@@ -30,8 +32,10 @@ public class SharkEnemy : MonoBehaviour
     [SerializeField] private float chaseSpeed = 18f;
     [SerializeField] private float chaseWaveAmplitude = 3f;
     [SerializeField] private float chaseWaveFrequency = 2f;
-    [SerializeField] private float chaseLungeDistance = 5f;
-    [SerializeField] private float chaseLungeHoldTime = 1.5f;
+    [SerializeField] private float chaseOffsetRadius = 8f;
+    [SerializeField] private float chaseCircleRadius = 6f;
+    [SerializeField] private float chaseCircleSpeed = 2f;
+    [SerializeField] private float chaseCircleDuration = 3f;
     [SerializeField] private float chaseDuration = 5f;
 
     [Header("Attack")]
@@ -53,6 +57,12 @@ public class SharkEnemy : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip damageSound;
+    [SerializeField] private AudioClip hitSound;
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip[] roarSounds;
+    [SerializeField] private float roarChance = 0.3f;
+    [SerializeField] private float roarCooldown = 4f;
+
 
     [Header("Events")]
     public UnityEvent OnAttack;
@@ -64,11 +74,15 @@ public class SharkEnemy : MonoBehaviour
     float splineProgress;
     float orbitPatienceTimer;
     float orbitChaseDelayTimer;
-    float chaseLungeTimer;
     bool wasScared;
     Vector3 lastBoatPosition;
     Vector3 attackTarget;
+    Vector3 repositionTarget;
+    Vector3 chasePoint;
+    float chaseCircleTimer;
+    bool chaseCircling;
     bool attackHit;
+    float roarTimer;
 
     public SharkState CurrentState => currentState;
 
@@ -81,8 +95,9 @@ public class SharkEnemy : MonoBehaviour
         }
 
         health = maxHealth;
-        lastBoatPosition = boat != null ? boat.position : Vector3.zero;
-        TeleportNearBoat();
+        lastBoatPosition = boat.position;
+        SetRepositionTarget();
+        transform.position = repositionTarget;
         StartIdle();
     }
 
@@ -119,13 +134,11 @@ public class SharkEnemy : MonoBehaviour
         return orbitSpline.transform.TransformPoint(new Vector3(position.x, position.y, position.z));
     }
 
-    // --- Teleport ---
-    void TeleportNearBoat()
+    void SetRepositionTarget()
     {
         float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
-        float dist = UnityEngine.Random.Range(teleportMinDist, teleportMaxDist);
-        Vector3 pos = boat.position + new Vector3(Mathf.Sin(angle) * dist, teleportDepth, Mathf.Cos(angle) * dist);
-        transform.position = pos;
+        float dist = UnityEngine.Random.Range(repositionMinDist, repositionMaxDist);
+        repositionTarget = boat.position + new Vector3(Mathf.Sin(angle) * dist, repositionDepth, Mathf.Cos(angle) * dist);
     }
 
     // --- Idle ---
@@ -133,17 +146,28 @@ public class SharkEnemy : MonoBehaviour
     {
         stateTimer = 0f;
         lastBoatPosition = boat.position;
+        SetRepositionTarget();
         TransitionTo(SharkState.Idle);
     }
 
     void UpdateIdle()
     {
+        Vector3 toTarget = repositionTarget - transform.position;
+        float distToTarget = toTarget.magnitude;
+
+        if (distToTarget > repositionArrivalDist)
+        {
+            transform.position += toTarget.normalized * repositionSpeed * Time.deltaTime;
+            transform.position = new Vector3(transform.position.x, repositionDepth, transform.position.z);
+            FaceDirection(toTarget.normalized);
+            return;
+        }
+
         stateTimer += Time.deltaTime;
 
         if (stateTimer >= idleObserveTime)
         {
             float boatSpeed = (boat.position - lastBoatPosition).magnitude / stateTimer;
-            TeleportNearBoat();
 
             if (boatSpeed < idleSpeedThreshold)
                 StartOrbit();
@@ -165,6 +189,7 @@ public class SharkEnemy : MonoBehaviour
     void UpdateOrbit()
     {
         stateTimer += Time.deltaTime;
+        roarTimer -= Time.deltaTime;
 
         splineProgress += orbitSpeed * Time.deltaTime;
         if (splineProgress > 1f) splineProgress -= 1f;
@@ -196,13 +221,22 @@ public class SharkEnemy : MonoBehaviour
         {
             StartAttack();
         }
+
+        PlayRoar();
     }
 
     // --- Chase ---
     void StartChase()
     {
         stateTimer = 0f;
-        chaseLungeTimer = 0f;
+        chaseCircleTimer = 0f;
+        chaseCircling = false;
+        if (chaseTarget == null) chaseTarget = boat;
+
+        float angle = UnityEngine.Random.Range(0f, Mathf.PI * 2f);
+        chasePoint = chaseTarget.position + new Vector3(Mathf.Cos(angle) * chaseOffsetRadius, 0f, Mathf.Sin(angle) * chaseOffsetRadius);
+        chasePoint.y = transform.position.y;
+
         animator.SetBool("IsJumping", true);
         TransitionTo(SharkState.Chase);
     }
@@ -210,6 +244,7 @@ public class SharkEnemy : MonoBehaviour
     void UpdateChase()
     {
         stateTimer += Time.deltaTime;
+        roarTimer -= Time.deltaTime;
 
         if (chaseTarget == null)
         {
@@ -217,39 +252,61 @@ public class SharkEnemy : MonoBehaviour
             return;
         }
 
-        Vector3 targetPos = chaseTarget.position;
-
-        float wave = Mathf.Sin(Time.time * chaseWaveFrequency) * chaseWaveAmplitude;
-        Vector3 waveOffset = transform.right * wave;
-        Vector3 moveTarget = targetPos + waveOffset;
-
-        Vector3 dir = moveTarget - transform.position;
-        float dist = dir.magnitude;
-
-        if (dist > 1f)
+        if (!chaseCircling)
         {
-            transform.position += dir.normalized * chaseSpeed * Time.deltaTime;
-            FaceDirection(dir.normalized);
-        }
+            Vector3 dir = chasePoint - transform.position;
+            float dist = dir.magnitude;
 
-        if (dist < chaseLungeDistance)
-        {
-            chaseLungeTimer += Time.deltaTime;
-            if (chaseLungeTimer >= chaseLungeHoldTime)
+            float wave = Mathf.Sin(Time.time * chaseWaveFrequency) * chaseWaveAmplitude;
+            Vector3 waveOffset = transform.right * wave;
+
+            if (dist > 1f)
             {
-                StartAttack();
-                return;
+                transform.position += (dir + waveOffset).normalized * chaseSpeed * Time.deltaTime;
+                FaceDirection(dir.normalized);
+            }
+
+            if (dist < 2f)
+            {
+                chaseCircling = true;
+                chaseCircleTimer = 0f;
             }
         }
         else
         {
-            chaseLungeTimer = 0f;
+            Vector3 toBoat = chaseTarget.position - transform.position;
+            toBoat.y = 0f;
+            Vector3 circleCenter = chaseTarget.position;
+
+            Vector3 toCenter = circleCenter - transform.position;
+            toCenter.y = 0f;
+
+            if (toCenter.magnitude > chaseCircleRadius + 2f)
+            {
+                transform.position += toCenter.normalized * chaseSpeed * Time.deltaTime;
+            }
+            else
+            {
+                Vector3 tangent = Vector3.Cross(Vector3.up, toCenter.normalized);
+                transform.position += tangent * chaseCircleSpeed * Time.deltaTime;
+            }
+
+            FaceDirection((circleCenter - transform.position).normalized);
+            chaseCircleTimer += Time.deltaTime;
+
+            if (chaseCircleTimer >= chaseCircleDuration)
+            {
+                StartAttack();
+                return;
+            }
         }
 
         if (stateTimer >= chaseDuration)
         {
             ScareAway();
         }
+
+        PlayRoar();
     }
 
     // --- Attack ---
@@ -258,11 +315,14 @@ public class SharkEnemy : MonoBehaviour
         stateTimer = 0f;
         attackHit = false;
 
-        Vector3 dir = boat.position - transform.position;
-        if (Physics.Raycast(transform.position, dir.normalized, out RaycastHit hit, dir.magnitude + 10f))
-            attackTarget = hit.point;
-        else
-            attackTarget = boat.position;
+        // Vector3 dir = boat.position - transform.position;
+        // if (Physics.Raycast(transform.position, dir.normalized, out RaycastHit hit, dir.magnitude + 10f))
+        //     attackTarget = hit.point;
+        // else
+        attackTarget = boat.position;
+
+        if (attackSound != null && audioSource != null)
+            audioSource.PlayOneShot(attackSound);
 
         animator.CrossFade("Jump", 0.1f);
         TransitionTo(SharkState.Attack);
@@ -308,14 +368,13 @@ public class SharkEnemy : MonoBehaviour
         awayDir.Normalize();
 
         Vector3 pos = transform.position + awayDir * fleeSpeed * Time.deltaTime;
-        pos.y = Mathf.Lerp(pos.y, teleportDepth, Time.deltaTime * 3f);
+        pos.y = Mathf.Lerp(pos.y, repositionDepth, Time.deltaTime * 3f);
         transform.position = pos;
         FaceDirection(awayDir);
 
         if (stateTimer >= fleeDuration)
         {
             animator.SetBool("IsFleeing", false);
-            TeleportNearBoat();
             StartIdle();
         }
     }
@@ -328,6 +387,7 @@ public class SharkEnemy : MonoBehaviour
         if (damageSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(damageSound);
+            audioSource.PlayOneShot(hitSound);
         }
 
         if (!useHealth)
@@ -365,6 +425,17 @@ public class SharkEnemy : MonoBehaviour
     }
 
     // --- Helpers ---
+    void PlayRoar()
+    {
+        if (roarSounds == null || roarSounds.Length == 0 || audioSource == null) return;
+        if (roarTimer > 0f) return;
+        if (UnityEngine.Random.value > roarChance) return;
+
+        AudioClip clip = roarSounds[UnityEngine.Random.Range(0, roarSounds.Length)];
+        audioSource.PlayOneShot(clip);
+        roarTimer = roarCooldown;
+    }
+
     void TransitionTo(SharkState newState)
     {
         currentState = newState;
@@ -409,7 +480,7 @@ public class SharkEnemy : MonoBehaviour
         GUILayout.Label($"Orbit patience: {orbitPatienceTimer:F1} / {orbitPatienceTime}");
         GUILayout.Label($"Chase delay: {orbitChaseDelayTimer:F1} / {orbitChaseDelay}");
         GUILayout.Label($"Distance to target: {dist:F1}");
-        GUILayout.Label($"Chase lunge: {chaseLungeTimer:F1} / {chaseLungeHoldTime}");
+        GUILayout.Label($"Chase circling: {chaseCircling} ({chaseCircleTimer:F1}s)");
         GUILayout.Label($"Attack: {stateTimer:F1} / {attackDuration}");
         GUILayout.Label($"State timer: {stateTimer:F1}");
         GUILayout.EndArea();

@@ -45,17 +45,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OceanGenerator
   chunkLength: 50
-  chunkWidth: 50
+  chunkWidth: 100
   viewDistance: 3
-  waterPrefab: {fileID: 8849270808253518514, guid: 485081bee442a807d9cd3fd981a734a5, type: 3}
+  waterPrefab: {fileID: 5184414111082793407, guid: 7e17d49508d4b7b8f80b83a1b841679d, type: 3}
   rockPrefabs:
   - {fileID: 1170932458222162837, guid: 0eb24b6ffe36d8ffdbb3671b3803658d, type: 3}
   - {fileID: 9064234641323245149, guid: c2716cf29e70874648f4b4af5d3625df, type: 3}
   - {fileID: 2239341270282046008, guid: d82b5f9086cbfd77fb65d5aec526dff9, type: 3}
   - {fileID: 5000015250269227873, guid: 176d59df91dd6c119883e9b7d7ac9ab2, type: 3}
   minRocksPerChunk: 3
-  maxRocksPerChunk: 7
+  maxRocksPerChunk: 5
   rowSpacing: 20
-  lanes: 4
-  minRockScale: 0.65
-  maxRockScale: 1.2
+  lanes: 6
+  minRockScale: 0.8
+  maxRockScale: 1
+  showGizmos: 0

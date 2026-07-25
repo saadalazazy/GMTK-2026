@@ -34,8 +34,8 @@ public class WaterBoat : MonoBehaviour
     [SerializeField] private float impactShakeStrength = 1.5f;
     [SerializeField] private float impactCooldown = 0.4f;
     [SerializeField] private float impactPushbackForce = 8f;
-    [SerializeField] private float tiltRecoveryTorque = 15f;
-    [SerializeField] private float tiltRecoverySpeed = 2f;
+    [SerializeField] private EngienManager engienManager;
+
 
     // -1..1: steer left/right. Set externally when UseKeyboardInput is false.
     public float SteerInput { get; set; }
@@ -54,6 +54,7 @@ public class WaterBoat : MonoBehaviour
 
     //internal Properties
     protected Vector3 CamVel;
+    private bool engienFire;
 
     public void Awake()
     {
@@ -78,15 +79,31 @@ public class WaterBoat : MonoBehaviour
 
         impactSource = gameObject.AddComponent<AudioSource>();
         impactSource.playOnAwake = false;
-
-        Rigidbody.angularDamping = 4f;
     }
 
     public void FixedUpdate()
     {
         if (UseKeyboardInput)
             ReadKeyboardInput();
+        if (engienManager != null && engienManager.HasActiveFires)
+        {
+            // Block new movement input.
+            SteerInput = 0f;
+            ThrottleInput = 0f;
 
+            // Stop the boat immediately.
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+
+            // Stop visual and audio movement feedback.
+            if (ParticleSystem != null)
+                ParticleSystem.Pause();
+
+            idleSource.volume = 1f;
+            movingSource.volume = 0f;
+
+            return; // Do not apply steering or engine force while there is a fire.
+        }
         //steer direction, clamp to [-1, 1] in case something feeds bad values
         var steer = Mathf.Clamp(SteerInput, -1f, 1f);
 
@@ -133,40 +150,24 @@ public class WaterBoat : MonoBehaviour
 
         //Audio crossfade based on actual movement
         bool isMoving = Rigidbody.linearVelocity.magnitude > 1f;
-        float targetIdle = isMoving ? 0f : 0.1f;
-        float targetMoving = isMoving ? 0.1f : 0f;
+        engienManager.SetBoatMoving(isMoving);
+        
+        float targetIdle = isMoving ? 0f : 1f;
+        float targetMoving = isMoving ? 1f : 0f;
         idleSource.volume = Mathf.MoveTowards(idleSource.volume, targetIdle, audioFadeSpeed * Time.fixedDeltaTime);
         movingSource.volume = Mathf.MoveTowards(movingSource.volume, targetMoving, audioFadeSpeed * Time.fixedDeltaTime);
-
-        // Tilt recovery: push boat back to level
-        Quaternion targetRot = Quaternion.LookRotation(transform.forward, Vector3.up);
-        Quaternion currentRot = transform.rotation;
-        Quaternion step = Quaternion.Slerp(currentRot, targetRot, tiltRecoverySpeed * Time.fixedDeltaTime);
-        Vector3 rotError = (new Vector3(step.eulerAngles.x, 0f, step.eulerAngles.z) - new Vector3(currentRot.eulerAngles.x, 0f, currentRot.eulerAngles.z)) * Mathf.Deg2Rad;
-        Rigidbody.AddTorque(rotError * tiltRecoveryTorque, ForceMode.Acceleration);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        print("Boat collided with: " + other.gameObject.name);
-
         if (Time.time - lastImpactTime < impactCooldown) return;
 
-        // Estimate force from relative velocity using the collider's rigidbody
-        Vector3 relativeVel = Vector3.zero;
-        Rigidbody otherRb = other.attachedRigidbody;
-        if (otherRb != null)
-            relativeVel = otherRb.linearVelocity - Rigidbody.linearVelocity;
-        else
-            relativeVel = -Rigidbody.linearVelocity;
-
-        float force = relativeVel.magnitude;
+        float force = collision.relativeVelocity.magnitude;
         if (force < impactForceThreshold) return;
 
         lastImpactTime = Time.time;
 
-        Vector3 pushDir = (other.transform.position - transform.position).normalized;
-        Rigidbody.AddForce(-pushDir * impactPushbackForce, ForceMode.Impulse);
+        Rigidbody.AddForce(collision.GetContact(0).normal * impactPushbackForce, ForceMode.Impulse);
 
         if (impactSounds.Length > 0)
         {
@@ -177,15 +178,6 @@ public class WaterBoat : MonoBehaviour
         {
             float scaledStrength = impactShakeStrength * Mathf.Clamp01(force / (impactForceThreshold * 3f));
             impactCamera.transform.DOShakeRotation(impactShakeDuration, scaledStrength, 8, 60);
-        }
-
-        if (other.GetComponentInParent<SharkEnemy>() != null)
-        {
-            Vector3 hitPoint = other.ClosestPoint(transform.position);
-            Vector3 boatCenter = Rigidbody.worldCenterOfMass;
-            Vector3 torqueAxis = Vector3.Cross(Vector3.up, (hitPoint - boatCenter).normalized);
-            float tiltForce = Mathf.Clamp(force * 2f, 5f, 30f);
-            Rigidbody.AddTorque(torqueAxis * tiltForce, ForceMode.Impulse);
         }
     }
 

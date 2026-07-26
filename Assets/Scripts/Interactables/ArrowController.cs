@@ -13,7 +13,6 @@ public class ArrowController : MonoBehaviour
     void OnEnable()
     {
         rb = GetComponent<Rigidbody>();
-        Destroy(gameObject, lifetime);
     }
 
     // void FixedUpdate()

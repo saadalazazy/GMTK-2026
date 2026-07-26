@@ -53554,7 +53554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fire
   maxHealth: 45
-  extinguishRate: 25
+  extinguishRate: 50
 --- !u!65 &6235126024298497219
 BoxCollider:
   m_ObjectHideFlags: 0

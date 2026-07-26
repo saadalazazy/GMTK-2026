@@ -1,7 +1,9 @@
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ValveHandwheel : MonoBehaviour
 {
@@ -22,6 +24,32 @@ public class ValveHandwheel : MonoBehaviour
     [Header("Rotation Smoothing")]
     [SerializeField] private float rotationSmoothing = 10f;
 
+    [Header("Valve UI")]
+    [SerializeField] private Image actionIcon;
+    [SerializeField] private TMP_Text actionText;
+    [SerializeField] private Transform uiPulseTarget;
+
+    [Header("Normal Hold UI")]
+    [SerializeField] private Sprite normalIcon;
+    [SerializeField] private string normalText = "Hold to turn valve";
+
+    [Header("Surge Spam UI")]
+    [SerializeField] private Sprite surgeIcon;
+    [SerializeField] private string surgeText = "SPAM to hold the valve!";
+
+    [Header("Sealed UI")]
+    [SerializeField] private Sprite sealedIcon;
+    [SerializeField] private string sealedText = "Valve sealed!";
+
+    [Header("Spam UI Pulse")]
+    [SerializeField] private float pulseSmallScale = 0.85f;
+    [SerializeField] private float pulseLargeScale = 1.15f;
+    [SerializeField] private float pulseDuration = 0.08f;
+
+    [Header("Canvas Fade")]
+    [SerializeField] private CanvasGroup uiCanvasGroup;
+    [SerializeField] private float fadeDuration = 0.2f;
+
     [Header("Events")]
     public UnityEvent onSealed;
 
@@ -32,15 +60,52 @@ public class ValveHandwheel : MonoBehaviour
     float surgeStartPercentage;
     bool hasSealed;
 
+    // UI-only variables
+    private Vector3 uiDefaultScale;
+    private Tween uiPulseTween;
+
+    private void Awake()
+    {
+        if (uiPulseTarget != null)
+            uiDefaultScale = uiPulseTarget.localScale;
+    }
+    public void ShowValveUi()
+    {
+        if (uiCanvasGroup == null) return;
+
+        uiCanvasGroup.DOKill();
+        uiCanvasGroup.DOFade(1f, fadeDuration);
+        uiCanvasGroup.blocksRaycasts = true;
+    }
+
+    public void HideValveUi()
+    {
+        if (uiCanvasGroup == null) return;
+
+        uiCanvasGroup.DOKill();
+        uiCanvasGroup.DOFade(0f, fadeDuration);
+        uiCanvasGroup.blocksRaycasts = false;
+    }
     void OnEnable()
     {
         var gameplay = actions.FindActionMap("Player");
         rotateAction = gameplay.FindAction("Attack");
+
+        SetValveUi(normalIcon, normalText);
+        ShowValveUi();
     }
 
     void OnDisable()
     {
         currentSealedPercentage = 0f;
+
+        uiPulseTween?.Kill();
+
+        if (uiPulseTarget != null)
+            uiPulseTarget.localScale = uiDefaultScale;
+
+        if (uiCanvasGroup != null)
+            uiCanvasGroup.alpha = 0f;
     }
 
     private void Update()
@@ -55,11 +120,19 @@ public class ValveHandwheel : MonoBehaviour
             if (isSurging)
             {
                 surgeStartPercentage = currentSealedPercentage;
+
+                // UI addition: switch to spam instruction.
+                SetValveUi(surgeIcon, surgeText);
+
                 if (cameraTransform != null)
-                    cameraTransform.DOShakeRotation(surgeTimer, shakeStrength, 10, 90, true).SetLoops(-1, LoopType.Restart);
+                    cameraTransform.DOShakeRotation(surgeTimer, shakeStrength, 10, 90, true)
+                        .SetLoops(-1, LoopType.Restart);
             }
             else
             {
+                // UI addition: return to normal instruction.
+                SetValveUi(normalIcon, normalText);
+
                 if (cameraTransform != null)
                     cameraTransform.DOKill();
             }
@@ -74,7 +147,12 @@ public class ValveHandwheel : MonoBehaviour
         {
             // During surge: spam to hold ground, don't gain progress
             if (rotateAction.WasPressedThisFrame())
+            {
                 currentSealedPercentage += 5f;
+
+                // UI addition: pulse when the player spams the button.
+                PulseSpamUi();
+            }
 
             currentSealedPercentage = Mathf.Min(currentSealedPercentage, surgeStartPercentage);
         }
@@ -90,9 +168,11 @@ public class ValveHandwheel : MonoBehaviour
         if (currentSealedPercentage >= 100f && !hasSealed)
         {
             hasSealed = true;
+
+            // UI addition: show completed state.
+            SetValveUi(sealedIcon, sealedText);
             onSealed?.Invoke();
         }
-
         else if (currentSealedPercentage < 100f)
         {
             hasSealed = false;
@@ -103,6 +183,41 @@ public class ValveHandwheel : MonoBehaviour
         float currentY = transform.localEulerAngles.y;
         float smoothedY = Mathf.LerpAngle(currentY, targetRotation, rotationSmoothing * Time.deltaTime);
         transform.localRotation = Quaternion.Euler(0, smoothedY, 0);
+    }
 
+    // ---------------- UI-ONLY METHODS ----------------
+
+    private void SetValveUi(Sprite icon, string message)
+    {
+        if (actionIcon != null)
+            actionIcon.sprite = icon;
+
+        if (actionText != null)
+            actionText.text = message;
+    }
+
+    private void PulseSpamUi()
+    {
+        if (uiPulseTarget == null)
+            return;
+
+        uiPulseTween?.Kill();
+
+        uiPulseTarget.localScale = uiDefaultScale;
+        uiPulseTween = uiPulseTarget
+            .DOScale(uiDefaultScale * pulseSmallScale, pulseDuration)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                uiPulseTween = uiPulseTarget
+                    .DOScale(uiDefaultScale * pulseLargeScale, pulseDuration)
+                    .SetEase(Ease.OutBack)
+                    .OnComplete(() =>
+                    {
+                        uiPulseTween = uiPulseTarget
+                            .DOScale(uiDefaultScale, pulseDuration)
+                            .SetEase(Ease.OutQuad);
+                    });
+            });
     }
 }

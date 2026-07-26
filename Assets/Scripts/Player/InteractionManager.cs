@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ public class InteractionManager : MonoBehaviour
 
     BaseHeldItem currentHeldItem;
 
+    [SerializeField] private TextMeshProUGUI hoveredItemName;
+
     Camera mainCamera;
 
     void Start()
@@ -30,6 +33,19 @@ public class InteractionManager : MonoBehaviour
         interactAction = gameplay.FindAction("Interact");
         useAction = gameplay.FindAction("Attack");
 
+    }
+
+
+    void OnDisable()
+    {
+        crosshairImage.enabled = false;
+        hoveredItemName.enabled = false;
+    }
+
+    void OnEnable()
+    {
+        crosshairImage.enabled = true;
+        hoveredItemName.enabled = true;
     }
 
     void Update()
@@ -73,14 +89,22 @@ public class InteractionManager : MonoBehaviour
         if (detected != currentTarget)
         {
             if (currentTarget != null)
+            {
+                hoveredItemName.text = "";
+                crosshairImage.sprite = defaultCrosshair;
                 currentTarget.OnItemExit(gameObject);
+            }
 
             currentTarget = detected;
 
             if (currentTarget != null)
+            {
                 currentTarget.OnItemEnter(gameObject);
+                crosshairImage.sprite = interactCrosshair;
+                hoveredItemName.text = hit.collider.name;
+            }
         }
 
-        crosshairImage.sprite = currentTarget != null ? interactCrosshair : defaultCrosshair;
+        // crosshairImage.sprite = currentTarget != null ? interactCrosshair : defaultCrosshair;
     }
 }

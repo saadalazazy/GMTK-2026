@@ -45,8 +45,6 @@ public class MinigameSwitcher : MonoBehaviour
         cooldownActive = true;
         isInMinigame = !isInMinigame;
 
-        print("Minigame state changed: " + isInMinigame);
-
         yield return null;
         if (isInMinigame)
         {

@@ -41,8 +41,6 @@ public class PlayerCore : MonoBehaviour
 
     [Header("Ladder")]
     public float climbSpeed = 4f;
-    public float ladderRaycastDist = 3f;
-    public LayerMask ladderLayer;
 
     [HideInInspector] public bool inputEnabled = true;
 
@@ -63,7 +61,10 @@ public class PlayerCore : MonoBehaviour
     private Vector3 bobVelocity;
     private bool isClimbing;
     private Ladder currentLadder;
+    private Ladder nearbyLadder;
     private float climbProgress;
+    private float climbCooldown;
+    private bool climbFlipped;
 
     public TyperwriterText typerwriterText { get; private set; }
 
@@ -122,6 +123,9 @@ public class PlayerCore : MonoBehaviour
     {
         Vector2 input = moveAction.ReadValue<Vector2>();
 
+        if (climbCooldown > 0f)
+            climbCooldown -= Time.deltaTime;
+
         if (isClimbing)
         {
             HandleClimbing(input);
@@ -173,29 +177,34 @@ public class PlayerCore : MonoBehaviour
             TryStartClimb(input);
         }
 
+        if (isClimbing) return;
         // Character Controller movement execution
         controller.Move((move * currentSpeed + velocity) * Time.deltaTime);
     }
 
     void TryStartClimb(Vector2 input)
     {
-        Camera cam = Camera.main;
-        if (cam == null) return;
+        if (climbCooldown > 0f || nearbyLadder == null) return;
+        if (Mathf.Abs(input.y) < 0.1f) return;
 
-        if (!Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, ladderRaycastDist))
-            return;
+        float distToBottom = Vector3.Distance(transform.position, nearbyLadder.GetPositionAtProgress(0f));
+        float distToTop = Vector3.Distance(transform.position, nearbyLadder.GetPositionAtProgress(1f));
+        bool fromTop = distToTop < distToBottom;
 
-        Ladder ladder = hit.collider.GetComponentInParent<Ladder>();
-        if (ladder == null) return;
+        StartClimbing(nearbyLadder, fromTop);
+    }
 
-        if (input.y > 0.1f)
-        {
-            StartClimbing(ladder, false);
-        }
-        else if (input.y < -0.1f)
-        {
-            StartClimbing(ladder, true);
-        }
+    void OnTriggerEnter(Collider other)
+    {
+        if (isClimbing) return;
+        Ladder ladder = other.GetComponentInParent<Ladder>();
+        if (ladder != null) nearbyLadder = ladder;
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        Ladder ladder = other.GetComponentInParent<Ladder>();
+        if (ladder != null && ladder == nearbyLadder) nearbyLadder = null;
     }
 
     void StartClimbing(Ladder ladder, bool fromTop)
@@ -203,28 +212,22 @@ public class PlayerCore : MonoBehaviour
         isClimbing = true;
         currentLadder = ladder;
         climbProgress = fromTop ? 1f : 0f;
+        climbFlipped = fromTop;
         velocity = Vector3.zero;
         controller.enabled = false;
     }
 
     void HandleClimbing(Vector2 input)
     {
-        float climbInput = input.y;
+        float climbInput = climbFlipped ? -input.y : input.y;
         float length = currentLadder.GetLength();
         float progressPerSecond = climbSpeed / length;
 
         climbProgress += climbInput * progressPerSecond * Time.deltaTime;
         climbProgress = Mathf.Clamp01(climbProgress);
 
-        Vector3 targetPos = currentLadder.GetPositionAtProgress(climbProgress);
-        transform.position = targetPos;
+        transform.position = currentLadder.GetOffsetPosition(climbProgress);
         controller.enabled = false;
-
-        // Face the ladder
-        Vector3 dir = currentLadder.GetDirection();
-        dir.y = 0f;
-        if (dir.sqrMagnitude > 0.001f)
-            transform.rotation = Quaternion.LookRotation(-dir);
 
         // Exit conditions
         if (climbProgress >= 1f || climbProgress <= 0f)
@@ -237,8 +240,10 @@ public class PlayerCore : MonoBehaviour
     {
         isClimbing = false;
         currentLadder = null;
+        nearbyLadder = null;
         controller.enabled = true;
         velocity = Vector3.zero;
+        climbCooldown = 0.6f;
     }
 
     void HandleLook()

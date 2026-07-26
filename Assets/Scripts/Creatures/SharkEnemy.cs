@@ -342,7 +342,7 @@ public class SharkEnemy : MonoBehaviour
 
         if (attackPoint != null)
         {
-            float randomX = Random.Range(-attackRandomOffsetX, attackRandomOffsetX);
+            float randomX = UnityEngine.Random.Range(-attackRandomOffsetX, attackRandomOffsetX);
             attackTarget = attackPoint.position + new Vector3(randomX, 0f, 0f);
         }
         else

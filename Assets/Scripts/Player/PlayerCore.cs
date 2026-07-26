@@ -1,4 +1,4 @@
-using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +9,6 @@ public class PlayerCore : MonoBehaviour
     public float moveSpeed = 6f;
     public float sprintSpeed = 10f;
     public float gravity = -9.81f;
-    public float jumpHeight = 1.5f;
 
     [Header("Look")]
     public float mouseSensitivity = 30f; // Adjusted for Time.deltaTime scaling
@@ -40,6 +39,11 @@ public class PlayerCore : MonoBehaviour
     [Header("Boat")]
     [SerializeField] private Rigidbody boatRigidbody;
 
+    [Header("Ladder")]
+    public float climbSpeed = 4f;
+    public float ladderRaycastDist = 3f;
+    public LayerMask ladderLayer;
+
     [HideInInspector] public bool inputEnabled = true;
 
 
@@ -47,7 +51,6 @@ public class PlayerCore : MonoBehaviour
     private AudioSource audioSource;
     private InputAction moveAction;
     private InputAction lookAction;
-    private InputAction jumpAction;
     private InputAction sprintAction;
 
     private Vector3 velocity;
@@ -58,8 +61,13 @@ public class PlayerCore : MonoBehaviour
     private Vector2 handOffset;
     private Vector2 handSpringVelocity;
     private Vector3 bobVelocity;
+    private bool isClimbing;
+    private Ladder currentLadder;
+    private float climbProgress;
 
     public TyperwriterText typerwriterText { get; private set; }
+
+    [SerializeField] private CanvasGroup winPanel;
 
     void Start()
     {
@@ -75,7 +83,6 @@ public class PlayerCore : MonoBehaviour
         var gameplay = actions.FindActionMap("Player");
         moveAction = gameplay.FindAction("Move");
         lookAction = gameplay.FindAction("Look");
-        jumpAction = gameplay.FindAction("Jump");
         sprintAction = gameplay.FindAction("Sprint");
 
         gameplay.Enable();
@@ -105,28 +112,41 @@ public class PlayerCore : MonoBehaviour
         HandleMovement();
     }
 
+    public void Win()
+    {
+        winPanel.gameObject.SetActive(true);
+        winPanel.DOFade(1f, 1f).SetEase(Ease.InOutQuad);
+    }
+
     void HandleMovement()
     {
-        // 1. Gravity logic
+        Vector2 input = moveAction.ReadValue<Vector2>();
+
+        if (isClimbing)
+        {
+            HandleClimbing(input);
+            return;
+        }
+
+        // Gravity logic
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
         else if (!controller.isGrounded)
             velocity.y += gravity * Time.deltaTime;
 
-        Vector2 input = moveAction.ReadValue<Vector2>();
         Vector3 move = transform.right * input.x + transform.forward * input.y;
 
         isSprinting = sprintAction.IsPressed() && input.magnitude > 0.1f;
         float currentSpeed = isSprinting ? sprintSpeed : moveSpeed;
 
-        // 2. Bob timer advancement
+        // Bob timer advancement
         if (input.magnitude > 0.1f && controller.isGrounded)
         {
             float bobSpeedMultiplier = isSprinting ? 1.4f : 1f;
             bobTimer += Time.deltaTime * bobFrequency * bobSpeedMultiplier;
         }
 
-        // 3. Camera/Hand Bob calculation
+        // Camera/Hand Bob calculation
         if (cameraBob)
         {
             Vector3 targetBob = Vector3.zero;
@@ -139,7 +159,7 @@ public class PlayerCore : MonoBehaviour
             cameraBob.localPosition = Vector3.SmoothDamp(cameraBob.localPosition, targetBob, ref bobVelocity, 1f / bobFrequency);
         }
 
-        // 4. Footstep triggering at sinusoidal trough
+        // Footstep triggering at sinusoidal trough
         bool isBobBottom = Mathf.Sin(bobTimer) < -0.85f;
         if (isBobBottom && !wasBobBottom && input.magnitude > 0.1f && controller.isGrounded)
         {
@@ -147,14 +167,78 @@ public class PlayerCore : MonoBehaviour
         }
         wasBobBottom = isBobBottom;
 
-        // 5. Jump logic
-        if (jumpAction.WasPressedThisFrame() && controller.isGrounded)
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        // Ladder detection
+        if (input.magnitude > 0.1f)
+        {
+            TryStartClimb(input);
+        }
 
-        // 6. Character Controller movement execution
-        Vector3 boatVelocity = boatRigidbody != null ? boatRigidbody.linearVelocity : Vector3.zero;
-
+        // Character Controller movement execution
         controller.Move((move * currentSpeed + velocity) * Time.deltaTime);
+    }
+
+    void TryStartClimb(Vector2 input)
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return;
+
+        if (!Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, ladderRaycastDist))
+            return;
+
+        Ladder ladder = hit.collider.GetComponentInParent<Ladder>();
+        if (ladder == null) return;
+
+        if (input.y > 0.1f)
+        {
+            StartClimbing(ladder, false);
+        }
+        else if (input.y < -0.1f)
+        {
+            StartClimbing(ladder, true);
+        }
+    }
+
+    void StartClimbing(Ladder ladder, bool fromTop)
+    {
+        isClimbing = true;
+        currentLadder = ladder;
+        climbProgress = fromTop ? 1f : 0f;
+        velocity = Vector3.zero;
+        controller.enabled = false;
+    }
+
+    void HandleClimbing(Vector2 input)
+    {
+        float climbInput = input.y;
+        float length = currentLadder.GetLength();
+        float progressPerSecond = climbSpeed / length;
+
+        climbProgress += climbInput * progressPerSecond * Time.deltaTime;
+        climbProgress = Mathf.Clamp01(climbProgress);
+
+        Vector3 targetPos = currentLadder.GetPositionAtProgress(climbProgress);
+        transform.position = targetPos;
+        controller.enabled = false;
+
+        // Face the ladder
+        Vector3 dir = currentLadder.GetDirection();
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.001f)
+            transform.rotation = Quaternion.LookRotation(-dir);
+
+        // Exit conditions
+        if (climbProgress >= 1f || climbProgress <= 0f)
+        {
+            StopClimbing();
+        }
+    }
+
+    void StopClimbing()
+    {
+        isClimbing = false;
+        currentLadder = null;
+        controller.enabled = true;
+        velocity = Vector3.zero;
     }
 
     void HandleLook()

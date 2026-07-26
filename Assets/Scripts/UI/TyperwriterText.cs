@@ -28,6 +28,8 @@ public class TyperwriterText : MonoBehaviour
 
     void OnEnable()
     {
+        fullText = textComponent.text;
+
         if (startOnEnable && !string.IsNullOrEmpty(fullText))
             StartTyping(fullText);
     }

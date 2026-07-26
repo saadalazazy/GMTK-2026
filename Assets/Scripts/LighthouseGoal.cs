@@ -20,7 +20,7 @@ public class LighthouseGoal : MonoBehaviour
         {
             triggered = true;
             onBoatReached?.Invoke();
-            FindFirstObjectByType<TyperwriterText>().StartTyping("You have reached the lighthouse! The journey is complete.");
+            FindFirstObjectByType<PlayerCore>().Win();
         }
     }
 }

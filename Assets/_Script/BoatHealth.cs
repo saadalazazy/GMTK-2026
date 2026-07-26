@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BoatHealth : MonoBehaviour
 {
@@ -11,11 +13,8 @@ public class BoatHealth : MonoBehaviour
     [SerializeField] private float sharkDamage = 25f;
     [SerializeField] private float damageCooldown = 0.5f;
 
-    [Header("Dissolve")]
-    [SerializeField] private Renderer boatRenderer;
-    [SerializeField] private int dissolveMaterialIndex = 1;
-    [SerializeField] private float dissolveFull = 0.828f;
-    [SerializeField] private float dissolveEmpty = 0.786f;
+    [Header("Health Bar")]
+    [SerializeField] private Slider healthSlider;
 
     [Header("Events")]
     public UnityEvent<float> OnDamageTaken;
@@ -30,7 +29,7 @@ public class BoatHealth : MonoBehaviour
     void Awake()
     {
         currentHealth = maxHealth;
-        UpdateDissolve();
+        UpdateHealthBar();
     }
 
     public void TakeDamage(float amount)
@@ -40,23 +39,20 @@ public class BoatHealth : MonoBehaviour
 
         lastDamageTime = Time.time;
         currentHealth = Mathf.Max(0f, currentHealth - amount);
-        UpdateDissolve();
+        UpdateHealthBar();
         OnDamageTaken?.Invoke(currentHealth);
 
         if (currentHealth <= 0f)
+        {
             OnDeath?.Invoke();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
-    void UpdateDissolve()
+    void UpdateHealthBar()
     {
-        if (boatRenderer == null) return;
-        float t = currentHealth / maxHealth;
-        float value = Mathf.Lerp(dissolveEmpty, dissolveFull, t);
-        Material[] materials = boatRenderer.materials;
-        if (dissolveMaterialIndex < materials.Length)
-        {
-            materials[dissolveMaterialIndex].SetFloat("_Disolve", value);
-        }
+        if (healthSlider == null) return;
+        healthSlider.value = 1f - (currentHealth / maxHealth);
     }
 
     public void TakeObstacleDamage()

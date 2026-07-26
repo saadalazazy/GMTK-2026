@@ -293,6 +293,8 @@ public class WaterBoat : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        print("Boat collided with: " + collision.gameObject.name);
+
         if (collision.gameObject.CompareTag("Player")) return;
         if (Time.time - lastImpactTime < impactCooldown) return;
 

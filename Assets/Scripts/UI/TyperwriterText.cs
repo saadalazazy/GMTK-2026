@@ -43,6 +43,8 @@ public class TyperwriterText : MonoBehaviour
         activeRoutine = StartCoroutine(TypeRoutine());
     }
 
+    public bool IsTyping => activeRoutine != null;
+
     public void Skip()
     {
         if (activeRoutine != null)

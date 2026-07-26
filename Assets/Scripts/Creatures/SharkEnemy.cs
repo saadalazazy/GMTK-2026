@@ -461,28 +461,5 @@ public class SharkEnemy : MonoBehaviour
         }
     }
 
-    void OnGUI()
-    {
-        if (!Debug.isDebugBuild) return;
-
-        float dist = 0f;
-        if (chaseTarget != null)
-            dist = Vector3.Distance(transform.position, chaseTarget.position);
-
-        float boatSpeed = 0f;
-        if (boat != null)
-            boatSpeed = (boat.position - lastBoatPosition).magnitude / Mathf.Max(stateTimer, 0.01f);
-
-        GUILayout.BeginArea(new Rect(10, 10, 280, 260));
-        GUILayout.Label($"State: {currentState}");
-        GUILayout.Label($"Health: {health:F0} / {maxHealth}");
-        GUILayout.Label($"Boat speed: {boatSpeed:F2}");
-        GUILayout.Label($"Orbit patience: {orbitPatienceTimer:F1} / {orbitPatienceTime}");
-        GUILayout.Label($"Chase delay: {orbitChaseDelayTimer:F1} / {orbitChaseDelay}");
-        GUILayout.Label($"Distance to target: {dist:F1}");
-        GUILayout.Label($"Chase circling: {chaseCircling} ({chaseCircleTimer:F1}s)");
-        GUILayout.Label($"Attack: {stateTimer:F1} / {attackDuration}");
-        GUILayout.Label($"State timer: {stateTimer:F1}");
-        GUILayout.EndArea();
-    }
+    
 }

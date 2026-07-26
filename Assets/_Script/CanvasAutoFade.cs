@@ -25,6 +25,7 @@ public class CanvasAutoFade : MonoBehaviour
         if (canvasGroup != null)
             canvasGroup.alpha = 0f;
 
+        text.text = "Press 'I' for help";
         isShowing = false;
     }
 
@@ -84,7 +85,7 @@ public class CanvasAutoFade : MonoBehaviour
 
         autoHideTimer = DOVirtual.DelayedCall(visibleTime, Hide);
 
-        text.text = "i to hide help";
+        text.text = "Press 'I' for hide help";
     }
 
     public void Hide()
@@ -97,7 +98,7 @@ public class CanvasAutoFade : MonoBehaviour
 
         isShowing = false;
         fadeTween = canvasGroup.DOFade(0f, fadeDuration);
-        text.text = "i to help";
+        text.text = "Press 'I' for help";
 
     }
 }

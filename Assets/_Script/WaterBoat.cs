@@ -36,10 +36,12 @@ public class WaterBoat : MonoBehaviour
     [SerializeField] private CanvasGroup stateCanvasGroup;
     [SerializeField] private float stateFadeDuration = 0.2f;
 
-    [TextArea] [SerializeField] private string normalStateText = "Boat is stable";
-    [TextArea] [SerializeField] private string engineFailedStateText = "Engine failed!";
-    [TextArea] [SerializeField] private string steamWarningStateText = "Steam pressure warning!";
-    [TextArea] [SerializeField] private string engineFireAndSteamStateText =
+    [TextArea][SerializeField] private string normalStateText = "Boat is stable";
+    [TextArea][SerializeField] private string engineFailedStateText = "Engine failed!";
+    [TextArea][SerializeField] private string steamWarningStateText = "Steam pressure warning!";
+    [TextArea]
+    [SerializeField]
+    private string engineFireAndSteamStateText =
         "Engine fire and steam pressure warning!";
     // ================== END NEW: STATE UI ==================
 
@@ -52,6 +54,7 @@ public class WaterBoat : MonoBehaviour
     [SerializeField] private float impactCooldown = 0.4f;
     [SerializeField] private float impactPushbackForce = 8f;
     [SerializeField] private EngienManager engienManager;
+    [SerializeField] private BoatHealth boatHealth;
 
     public float SteerInput { get; set; }
     public float ThrottleInput { get; set; }
@@ -307,6 +310,9 @@ public class WaterBoat : MonoBehaviour
             float scaledStrength = impactShakeStrength * Mathf.Clamp01(force / (impactForceThreshold * 3f));
             impactCamera.transform.DOShakeRotation(impactShakeDuration, scaledStrength, 8, 60);
         }
+
+        if (boatHealth != null)
+            boatHealth.TakeObstacleDamage();
     }
 
     private void ReadKeyboardInput()

@@ -60,7 +60,7 @@ public class HarpoonController : MonoBehaviour
         harpoonAnchor.Rotate(Vector3.up, lookInput.x * rotationSpeed * Time.deltaTime);
         float y = harpoonAnchor.localEulerAngles.y;
         if (y > 180f) y -= 360f;
-        y = Mathf.Clamp(y, -70f, 70f);
+        y = Mathf.Clamp(y, -90f, 90f);
         harpoonAnchor.localEulerAngles = new Vector3(
             harpoonAnchor.localEulerAngles.x,
             y,
@@ -69,7 +69,7 @@ public class HarpoonController : MonoBehaviour
 
 
         zRotation -= lookInput.y * rotationSpeed * Time.deltaTime;
-        zRotation = Mathf.Clamp(zRotation, -45f, 30f);
+        zRotation = Mathf.Clamp(zRotation, -70f, 70f);
 
         harpoonBodyAnchor.localRotation = Quaternion.Euler(0f, 0f, zRotation);
 

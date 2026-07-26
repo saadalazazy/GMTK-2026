@@ -26,6 +26,8 @@ public class SharkEnemy : MonoBehaviour
     [SerializeField] private float orbitLungeRange = 6f;
     [SerializeField] private float orbitPatienceTime = 8f;
     [SerializeField] private float orbitChaseDelay = 1f;
+    [SerializeField] private float orbitApproachSpeed = 10f;
+    [SerializeField] private float orbitApproachArrivalDist = 2f;
 
     [Header("Chase")]
     [SerializeField] private Transform chaseTarget;
@@ -70,6 +72,7 @@ public class SharkEnemy : MonoBehaviour
 
     SharkState currentState;
     float health;
+    BoatHealth boatHealth;
     float stateTimer;
     float splineProgress;
     float orbitPatienceTimer;
@@ -83,6 +86,7 @@ public class SharkEnemy : MonoBehaviour
     bool chaseCircling;
     bool attackHit;
     float roarTimer;
+    bool approachingAttack;
 
     public SharkState CurrentState => currentState;
 
@@ -94,6 +98,7 @@ public class SharkEnemy : MonoBehaviour
             if (player != null) boat = player.transform;
         }
 
+        boatHealth = FindFirstObjectByType<BoatHealth>();
         health = maxHealth;
         lastBoatPosition = boat.position;
         SetRepositionTarget();
@@ -191,6 +196,24 @@ public class SharkEnemy : MonoBehaviour
         stateTimer += Time.deltaTime;
         roarTimer -= Time.deltaTime;
 
+        if (approachingAttack)
+        {
+            Vector3 knot0Pos = EvaluateSpline(0f);
+            Vector3 toKnot = knot0Pos - transform.position;
+
+            if (toKnot.magnitude > orbitApproachArrivalDist)
+            {
+                transform.position += toKnot.normalized * orbitApproachSpeed * Time.deltaTime;
+                FaceDirection(toKnot.normalized);
+            }
+            else
+            {
+                approachingAttack = false;
+                StartAttack();
+            }
+            return;
+        }
+
         splineProgress += orbitSpeed * Time.deltaTime;
         if (splineProgress > 1f) splineProgress -= 1f;
 
@@ -219,7 +242,7 @@ public class SharkEnemy : MonoBehaviour
 
         if (orbitPatienceTimer <= 0f)
         {
-            StartAttack();
+            approachingAttack = true;
         }
 
         PlayRoar();
@@ -350,10 +373,17 @@ public class SharkEnemy : MonoBehaviour
         {
             attackHit = true;
             OnAttack?.Invoke();
+            if (boatHealth != null) boatHealth.TakeSharkDamage();
             ScareAway();
         }
         else if (t >= 1f)
         {
+            if (!attackHit)
+            {
+                attackHit = true;
+                OnAttack?.Invoke();
+                if (boatHealth != null) boatHealth.TakeSharkDamage();
+            }
             ScareAway();
         }
     }
@@ -461,5 +491,5 @@ public class SharkEnemy : MonoBehaviour
         }
     }
 
-    
+
 }

@@ -2235,7 +2235,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Fire
+  m_text: Put out the fire as quickly as possible using the fire extinguisher located
+    next to the engine room door.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
   m_sharedMaterial: {fileID: 2170886460080104909, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
@@ -6301,8 +6302,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1712916503}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.047779392, y: 0.88409317, z: -0.09273265, w: -0.45551848}
-  m_LocalPosition: {x: 23.916893, y: 9.199999, z: 17.048107}
+  m_LocalRotation: {x: 0.5141757, y: -0.04199375, z: 0.025216097, w: 0.85628504}
+  m_LocalPosition: {x: 0.5737829, y: 13.983444, z: -5.8358727}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6875,7 +6876,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cabin
+  m_text: "Temperature Gauge \u2014 Shows the current temperature.\nWarning Light
+    \u2014 If it keeps flashing and beeping repeatedly, the pressure is too high.\nRadar
+    \u2014 The yellow dots represent buoys, the red dot represents a dangerous obstacle,
+    and the white dot represents the ship"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
   m_sharedMaterial: {fileID: 2170886460080104909, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
@@ -8467,9 +8471,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Gameplay akfjaldjfald;\nf lan kdjfaklsdf  fadsfljakdjf;  fndsaf das\nfdasfkladslf
-    kjads f\ndf dsalfjaldsjfklasjdflkjasdfj;a \ndfasdfjaldsjflkadsjflkajdfl ;adf\n
-    dlkfjalskdjfalsjdfl"
+  m_text: "Reach the lighthouse and try not to let the shark destroy your boat before
+    you get there.\n\nSteam Valve \u2014 Use it to reduce the pressure.\nFire Extinguisher
+    \u2014 Use it to put out fires in the engine room.\nSteering Wheel \u2014 Located
+    on the second floor.\nHarpoon \u2014 Use it to attack the dangers you encounter.\nAlways
+    watch out for the shark. It is always a threat."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
   m_sharedMaterial: {fileID: 2170886460080104909, guid: cb2b0d33b4596e17d9e5e912bb2e5998, type: 2}
@@ -10679,6 +10685,10 @@ GameObject:
   - component: {fileID: 2199250151739032469}
   - component: {fileID: 8939057637822927076}
   - component: {fileID: 1098620837}
+  - component: {fileID: 8939057637822927080}
+  - component: {fileID: 8939057637822927079}
+  - component: {fileID: 8939057637822927078}
+  - component: {fileID: 8939057637822927077}
   m_Layer: 0
   m_Name: Boat Ground
   m_TagString: Untagged
@@ -13666,6 +13676,90 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8939057637822927077
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755968001950711232}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7.9933405, y: 0.7613047, z: 2.2752736}
+  m_Center: {x: 0, y: 10.641654, z: -0.31327796}
+--- !u!65 &8939057637822927078
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755968001950711232}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7.9933405, y: 1.5877625, z: 2.2752736}
+  m_Center: {x: 0, y: -11.038972, z: -0.31327796}
+--- !u!65 &8939057637822927079
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755968001950711232}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.82597256, y: 22.855154, z: 2.2752736}
+  m_Center: {x: 3.583684, y: -0.40527344, z: -0.31327796}
+--- !u!65 &8939057637822927080
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755968001950711232}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.130667, y: 22.855154, z: 2.2752736}
+  m_Center: {x: -3.4313369, y: -0.40527344, z: -0.31327796}
 --- !u!4 &8946660039582568792
 Transform:
   m_ObjectHideFlags: 0

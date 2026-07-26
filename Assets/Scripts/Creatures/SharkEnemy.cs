@@ -375,7 +375,7 @@ public class SharkEnemy : MonoBehaviour
         if (flatDir.sqrMagnitude > 0.01f)
             FaceDirection(flatDir.normalized);
 
-        if (!attackHit)
+        if (!attackHit && Vector3.Distance(transform.position, attackTarget) < 2f)
         {
             attackHit = true;
             OnAttack?.Invoke();

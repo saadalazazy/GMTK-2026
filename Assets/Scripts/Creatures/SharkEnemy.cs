@@ -41,6 +41,8 @@ public class SharkEnemy : MonoBehaviour
     [SerializeField] private float chaseDuration = 5f;
 
     [Header("Attack")]
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float attackRandomOffsetX = 3f;
     [SerializeField] private float attackDuration = 1f;
     [SerializeField] private float attackSpeed = 30f;
     [SerializeField] private float attackLungeHeight = 3f;
@@ -338,11 +340,15 @@ public class SharkEnemy : MonoBehaviour
         stateTimer = 0f;
         attackHit = false;
 
-        // Vector3 dir = boat.position - transform.position;
-        // if (Physics.Raycast(transform.position, dir.normalized, out RaycastHit hit, dir.magnitude + 10f))
-        //     attackTarget = hit.point;
-        // else
-        attackTarget = boat.position;
+        if (attackPoint != null)
+        {
+            float randomX = Random.Range(-attackRandomOffsetX, attackRandomOffsetX);
+            attackTarget = attackPoint.position + new Vector3(randomX, 0f, 0f);
+        }
+        else
+        {
+            attackTarget = boat.position;
+        }
 
         if (attackSound != null && audioSource != null)
             audioSource.PlayOneShot(attackSound);

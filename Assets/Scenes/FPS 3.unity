@@ -890,7 +890,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3548607763533127610, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.34698
+      value: 13.07
       objectReference: {fileID: 0}
     - target: {fileID: 3548607763533127610, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -933,6 +933,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8481702088152723050}
     - target: {fileID: 3638457796025466627, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
+      propertyPath: attackPoint
+      value: 
+      objectReference: {fileID: 282044276}
+    - target: {fileID: 3638457796025466627, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
       propertyPath: chaseTarget
       value: 
       objectReference: {fileID: 794866924}
@@ -940,6 +944,10 @@ PrefabInstance:
       propertyPath: orbitSpline
       value: 
       objectReference: {fileID: 238675536}
+    - target: {fileID: 5067088044067100357, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5501926924940686494, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
       propertyPath: m_Name
       value: Shark
@@ -949,6 +957,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
+--- !u!1 &282044275
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 282044276}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &282044276
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282044275}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.63, y: 2.65, z: -11.46}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8481702088152723050}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &284680013
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1052,6 +1091,17 @@ ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 3523835924748123208, guid: 0fe47534c19ad024f9ed0829d8d8887a, type: 3}
   m_PrefabInstance: {fileID: 284680013}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &321847003 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3638457796025466627, guid: 0efc8e70c5876cea2b9eced734ccf31c, type: 3}
+  m_PrefabInstance: {fileID: 259682190}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecd29108d746c97d1b1db566b25a71b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SharkEnemy
 --- !u!1 &329287683
 GameObject:
   m_ObjectHideFlags: 0
@@ -2237,7 +2287,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 624272595}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b62292fbfbb286cc6adebcc2d65c04f0, type: 3}
   m_Name: 
@@ -2275,7 +2325,7 @@ Transform:
   m_GameObject: {fileID: 624272595}
   serializedVersion: 2
   m_LocalRotation: {x: -0.0064133876, y: -0.14699736, z: 0.0052527655, w: -0.9891022}
-  m_LocalPosition: {x: 0.788, y: 2.706, z: -2.111}
+  m_LocalPosition: {x: 0.57, y: 3.23, z: -5.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2606,6 +2656,66 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!1 &727789076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 727789077}
+  - component: {fileID: 727789078}
+  m_Layer: 0
+  m_Name: IntroSequence
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &727789077
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727789076}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.64502, y: 4.78341, z: 0.30558}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &727789078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727789076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20ad2c99b13575fa18b5256c145d7791, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IntroSequence
+  typewriter: {fileID: 994741377}
+  introTexts:
+  - Move towards the lighthouse
+  - Beware of the shark!
+  textDelay: 2.5
+  scriptsToDisable:
+  - {fileID: 624272597}
+  - {fileID: 624272602}
+  - {fileID: 321847003}
+  introCamera: {fileID: 1712916506}
+  onIntroStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onIntroEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &743014262
 GameObject:
   m_ObjectHideFlags: 0
@@ -3398,6 +3508,17 @@ Transform:
   - {fileID: 148882947}
   m_Father: {fileID: 1012696453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &994741377 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6672705199113148311, guid: d574e0d737972669a82dbf565a8b93f5, type: 3}
+  m_PrefabInstance: {fileID: 118813713}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef0678b8b7774397b2dadbfb70ced4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TyperwriterText
 --- !u!198 &1006251227 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 3523835924748123208, guid: 0fe47534c19ad024f9ed0829d8d8887a, type: 3}
@@ -3941,31 +4062,31 @@ PrefabInstance:
       objectReference: {fileID: 1781801247}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5737829
+      value: 0.66699696
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.983444
+      value: 6.6540008
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.8358727
+      value: -5.84
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8562849
+      value: 0.95952237
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.51417583
+      value: 0.2758394
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.04199378
+      value: -0.054616854
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.025216121
+      value: 0.015701022
       objectReference: {fileID: 0}
     - target: {fileID: 2321251623192849273, guid: d29450c3a7188d0adb8ff35ec1536a91, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5849,35 +5970,35 @@ MonoBehaviour:
       TangentIn:
         x: -0
         y: -0
-        z: -2.2875392
+        z: -2.283484
       TangentOut:
         x: 0
         y: 0
-        z: 2.5520186
+        z: 2.4130685
       Rotation:
         value:
-          x: -0.055864275
-          y: 0.93007624
-          z: 0.13860564
-          w: 0.33559787
+          x: 0.027389418
+          y: 0.9337938
+          z: -0.08137162
+          w: 0.3473581
     - Position:
-        x: 14.770355
-        y: 4.783444
-        z: -46.2089
+        x: 14.863572
+        y: -2.546
+        z: -46.213028
       TangentIn:
         x: -0
         y: -0
-        z: -0.88230664
+        z: -0.79164827
       TangentOut:
         x: 0
         y: 0
-        z: 0.88230664
+        z: 0.79164827
       Rotation:
         value:
-          x: -0.13885742
-          y: 0.835449
-          z: 0.2461268
-          w: 0.47134396
+          x: 0.07934772
+          y: 0.85796326
+          z: -0.14236973
+          w: 0.48716915
     m_MetaData:
     - Mode: 0
       Tension: 0.5
@@ -6329,7 +6450,7 @@ GameObject:
   - component: {fileID: 1712916504}
   - component: {fileID: 1712916508}
   m_Layer: 0
-  m_Name: CinemachineCamera
+  m_Name: Intro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6453,8 +6574,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1712916503}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.047779392, y: 0.88409317, z: -0.09273265, w: -0.45551848}
-  m_LocalPosition: {x: 23.916893, y: 9.199999, z: 17.048107}
+  m_LocalRotation: {x: 0.27583945, y: -0.054616854, z: 0.015701024, w: 0.9595223}
+  m_LocalPosition: {x: 0.66699696, y: 6.6540008, z: -5.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7137,7 +7258,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1260057304703761478, guid: 779bcfc4f6e78aedb9934b82b3d32c91, type: 3}
       propertyPath: lighthouseChunkIndex
-      value: 10
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 1260057304703761478, guid: 779bcfc4f6e78aedb9934b82b3d32c91, type: 3}
       propertyPath: lighthouseChunkPrefab
@@ -13764,6 +13885,7 @@ Transform:
   - {fileID: 543450653185275734}
   - {fileID: 238675535}
   - {fileID: 794866924}
+  - {fileID: 282044276}
   - {fileID: 208979655}
   - {fileID: 354757099}
   - {fileID: 8061379960154367585}
@@ -14107,3 +14229,4 @@ SceneRoots:
   - {fileID: 259682190}
   - {fileID: 1712916507}
   - {fileID: 1583482910}
+  - {fileID: 727789077}

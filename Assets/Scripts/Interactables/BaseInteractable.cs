@@ -19,7 +19,6 @@ public class BaseInteractable : MonoBehaviour, IInteractable
         if (outline != null)
             outline.enabled = true;
     }
-
     public void OnItemExit(GameObject player)
     {
         if (outline != null)

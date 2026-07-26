@@ -20,7 +20,7 @@ public class FireExtinguisher : BaseHeldItem
         audioSource.clip = spraySound;
         audioSource.loop = true;
 
-        sprayParticles.Stop();
+        sprayParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     public override void OnItemUse(GameObject player)
@@ -46,7 +46,7 @@ public class FireExtinguisher : BaseHeldItem
     {
         audioSource.Stop();
 
-        sprayParticles.Stop();
+        sprayParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     private void OnDisable()
@@ -55,6 +55,6 @@ public class FireExtinguisher : BaseHeldItem
             audioSource.Stop();
 
         if (sprayParticles != null)
-            sprayParticles.Stop();
+            sprayParticles.Stop(true , ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 }

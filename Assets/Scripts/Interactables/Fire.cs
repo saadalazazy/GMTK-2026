@@ -4,7 +4,7 @@ public class Fire : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float extinguishRate = 25f;
-
+    [SerializeField] private Transform vfx;
     ParticleSystem particles;
     float health;
 
@@ -19,7 +19,7 @@ public class Fire : MonoBehaviour
         health -= amount;
 
         float t = health / maxHealth;
-        transform.localScale = Vector3.one * Mathf.Lerp(0.1f, 1f, t);
+        vfx.localScale = Vector3.one * Mathf.Lerp(0.1f, 1f, t);
 
         var main = particles.main;
         main.startLifetime = Mathf.Lerp(0f, main.startLifetime.constantMax, t);

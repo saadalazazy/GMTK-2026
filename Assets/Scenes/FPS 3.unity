@@ -1182,8 +1182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EngienManager
   maxHeat: 100
   normalHeat: 20
-  heatIncreasePerSecond: 0.15
-  heatDecreasePerSecond: 0.2
+  heatIncreasePerSecond: 4
+  heatDecreasePerSecond: 1
   fireStartHeat: 90
   firePrefab: {fileID: 5101912937195500519, guid: 4f075fc329fc43d448b4c94cdab6a988, type: 3}
   fireSpawnPoints:
@@ -1522,7 +1522,7 @@ MonoBehaviour:
   loadedArrow: {fileID: 3541013050161607513}
   harpoonBodyAnchor: {fileID: 59930270}
   harpoonArrowAnchor: {fileID: 6068651441392964272}
-  shootingForce: 2500
+  shootingForce: 2000
   reloadDelay: 2
   shootSound: {fileID: 8300000, guid: 4789cebc9edd30a18ba29f9f0b5e9877, type: 3}
   audioSource: {fileID: 919132149536239085}
@@ -1837,8 +1837,8 @@ MonoBehaviour:
   warningLight: {fileID: 0}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   emissionIntensity: 3
-  minTimeToCritical: 60
-  maxTimeToCritical: 100
+  minTimeToCritical: 50
+  maxTimeToCritical: 70
   startOnGameStart: 1
   repeatSystem: 0
   delayBeforeRepeat: 2
